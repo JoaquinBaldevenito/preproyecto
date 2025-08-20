@@ -2,7 +2,8 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-
+#include <string.h>
+struct Tree;  /* forward declaration */
 
 typedef struct Tree {
     char *tipo;            /* nombre del nodo: "INT", "+", "*" ... */
@@ -26,7 +27,7 @@ void printTree(Tree *n, int level) {
     if (!n) return;
     for (int i=0; i<level; i++) printf("  ");
     if (strcmp(n->tipo,"INT")==0)
-        printf("%s(%d)\n", n->tipo, n->valor);
+        printf("%s(%d)\n", n->tipo, n->value);
     else
         printf("%s\n", n->tipo);
     printTree(n->left, level+1);
@@ -38,8 +39,7 @@ void printTree(Tree *n, int level) {
 %union {
     int num;    /* para INT */
     char* id;   /* para ID */
-    char* boolean; /* para TRUE y FALSE */
-    Tree* node;  /* para expresiones */
+    struct Tree* node;  /* para expresiones */
 }
 
 /* Palabras Reservadas*/
@@ -48,7 +48,7 @@ void printTree(Tree *n, int level) {
 %token <num> INT /* Números enteros */
 
 /* Constantes Booleanas */
-%token <boolean> TRUE FALSE
+%token <num> TRUE FALSE
 
 /* Operadores */
 %token OR AND EQ NEQ 
@@ -80,7 +80,6 @@ programa : T MAIN '(' ')' bloque  {
         ;
 
 bloque : '{' lista_sentencias '}' {$$ = createNode("bloque", 0, $2, NULL);}
-       | '{' '}' {$$ = createNode("bloque", 0, NULL, NULL);}
         ;
 lista_sentencias : sentencia  lista_sentencias
                 | {$$ = NULL;}  /* epsilon */
@@ -99,7 +98,7 @@ declaracion : T ID
 asignacion : ID '=' E { 
                 $$ = createNode("=",0,NULL,NULL);
                 $$->left = createNode("ID",0,NULL,NULL);
-                $$->left->id = $1; 
+                $$->left->name = $1; 
                 $$->right = $3; 
             }
            ;
@@ -128,8 +127,8 @@ E   : E '+' E { $$ = createNode("+",0,$1,$3); }
 
     | INT { $$ = createNode("INT",$1,NULL,NULL); }
 
-    | TRUE { $$ = createNode("TRUE",$1,NULL,NULL); }
+    | TRUE { $$ = createNode("TRUE",1,NULL,NULL); }
 
-    | FALSE { $$ = createNode("FALSE",$1,NULL,NULL); }
+    | FALSE { $$ = createNode("FALSE",0,NULL,NULL); }
     ;
 %%

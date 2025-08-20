@@ -81,14 +81,13 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 38 "parserbison.y"
+#line 39 "parserbison.y"
 
     int num;    /* para INT */
     char* id;   /* para ID */
-    char* boolean; /* para TRUE y FALSE */
-    Tree* node;  /* para expresiones */
+    struct Tree* node;  /* para expresiones */
 
-#line 92 "parserbison.tab.h"
+#line 91 "parserbison.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;
