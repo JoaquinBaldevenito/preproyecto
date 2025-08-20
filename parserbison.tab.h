@@ -55,16 +55,16 @@ extern int yydebug;
     YYerror = 256,                 /* error  */
     YYUNDEF = 257,                 /* "invalid token"  */
     MAIN = 258,                    /* MAIN  */
-    INT = 259,                     /* INT  */
-    BOOL = 260,                    /* BOOL  */
-    VOID = 261,                    /* VOID  */
-    RETURN = 262,                  /* RETURN  */
-    IF = 263,                      /* IF  */
-    ELSE = 264,                    /* ELSE  */
-    WHILE = 265,                   /* WHILE  */
-    T_INT = 266,                   /* T_INT  */
-    T_BOOL = 267,                  /* T_BOOL  */
-    T_VOID = 268,                  /* T_VOID  */
+    BOOL = 259,                    /* BOOL  */
+    VOID = 260,                    /* VOID  */
+    RETURN = 261,                  /* RETURN  */
+    IF = 262,                      /* IF  */
+    ELSE = 263,                    /* ELSE  */
+    WHILE = 264,                   /* WHILE  */
+    T_INT = 265,                   /* T_INT  */
+    T_BOOL = 266,                  /* T_BOOL  */
+    T_VOID = 267,                  /* T_VOID  */
+    INT = 268,                     /* INT  */
     TRUE = 269,                    /* TRUE  */
     FALSE = 270,                   /* FALSE  */
     OR = 271,                      /* OR  */
@@ -79,7 +79,19 @@ extern int yydebug;
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-typedef int YYSTYPE;
+union YYSTYPE
+{
+#line 38 "parserbison.y"
+
+    int num;    /* para INT */
+    char* id;   /* para ID */
+    char* boolean; /* para TRUE y FALSE */
+    Tree* node;  /* para expresiones */
+
+#line 92 "parserbison.tab.h"
+
+};
+typedef union YYSTYPE YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
 #endif

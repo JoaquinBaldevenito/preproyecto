@@ -30,11 +30,15 @@ NUMERO      0|[1-9][0-9]*
 "false"             {printf("false : %s\n",yytext); return FALSE; }
 
     /* Números */
-{NUMERO}            {printf("INT : %d\n",atoi(yytext));
+{NUMERO}            {
+                    yylval.num = atoi(yytext);
+                    printf("INT : %d\n",atoi(yytext));
                     return INT; }
 
     /* Identificadores */
-{ID}                {printf("ID : %s\n",yytext);
+{ID}                {
+                    yylval.id = strdup(yytext);
+                    printf("ID : %s\n",yytext);
                     return ID; }
 
     /* Operadores de un solo carácter y delimitadores */
