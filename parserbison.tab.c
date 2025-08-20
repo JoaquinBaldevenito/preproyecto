@@ -98,14 +98,26 @@ void printTree(Tree *n, int level) {
     for (int i=0; i<level; i++) printf("  ");
     if (strcmp(n->tipo,"INT")==0)
         printf("%s(%d)\n", n->tipo, n->value);
+    else if (strcmp(n->tipo,"ID")==0)
+        printf("%s(%s)\n", n->tipo, n->name);
     else
         printf("%s\n", n->tipo);
-    printTree(n->left, level+1);
-    printTree(n->right, level+1);
+
+    if(n->left) {
+        for(int i=0;i<=level;i++) printf("  "); 
+        printf("left:\n");
+        printTree(n->left, level+2);
+    }
+    if(n->right) {
+        for(int i=0;i<=level;i++) printf("  ");
+        printf("right:\n");
+        printTree(n->right, level+2);
+    }
 }
 
 
-#line 109 "parserbison.tab.c"
+
+#line 121 "parserbison.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -562,9 +574,9 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    76,    76,    82,    84,    85,    88,    89,    90,    91,
-      94,    95,    98,   106,   107,   108,   113,   115,   117,   119,
-     121,   123,   125,   128,   130,   132
+       0,    88,    88,    94,    96,   103,   106,   107,   108,   109,
+     112,   113,   116,   124,   125,   126,   131,   133,   135,   137,
+     139,   141,   143,   146,   148,   150
 };
 #endif
 
@@ -1153,130 +1165,142 @@ yyreduce:
   switch (yyn)
     {
   case 2: /* programa: T MAIN '(' ')' bloque  */
-#line 76 "parserbison.y"
+#line 88 "parserbison.y"
                                   { 
                                     printf("No hay errores \n");
                                     printTree((yyvsp[0].node), 0);
                                     }
-#line 1162 "parserbison.tab.c"
-    break;
-
-  case 3: /* bloque: '{' lista_sentencias '}'  */
-#line 82 "parserbison.y"
-                                  {(yyval.node) = createNode("bloque", 0, (yyvsp[-1].node), NULL);}
-#line 1168 "parserbison.tab.c"
-    break;
-
-  case 5: /* lista_sentencias: %empty  */
-#line 85 "parserbison.y"
-                  {(yyval.node) = NULL;}
 #line 1174 "parserbison.tab.c"
     break;
 
-  case 8: /* sentencia: RETURN E ';'  */
-#line 90 "parserbison.y"
-                         {(yyval.node) = createNode("RETURN", 0, (yyvsp[-1].node), NULL);}
+  case 3: /* bloque: '{' lista_sentencias '}'  */
+#line 94 "parserbison.y"
+                                  {(yyval.node) = createNode("bloque", 0, (yyvsp[-1].node), NULL);}
 #line 1180 "parserbison.tab.c"
     break;
 
+  case 4: /* lista_sentencias: sentencia lista_sentencias  */
+#line 96 "parserbison.y"
+                                               { 
+          if ((yyvsp[0].node) == NULL) (yyval.node) = (yyvsp[-1].node); 
+          else {
+              Tree *n = createNode("list", 0, (yyvsp[-1].node), (yyvsp[0].node));
+              (yyval.node) = n;
+          }
+      }
+#line 1192 "parserbison.tab.c"
+    break;
+
+  case 5: /* lista_sentencias: %empty  */
+#line 103 "parserbison.y"
+                  {(yyval.node) = NULL;}
+#line 1198 "parserbison.tab.c"
+    break;
+
+  case 8: /* sentencia: RETURN E ';'  */
+#line 108 "parserbison.y"
+                         {(yyval.node) = createNode("RETURN", 0, (yyvsp[-1].node), NULL);}
+#line 1204 "parserbison.tab.c"
+    break;
+
   case 9: /* sentencia: RETURN ';'  */
-#line 91 "parserbison.y"
+#line 109 "parserbison.y"
                        {(yyval.node) = createNode("RETURN", 0, NULL, NULL);}
-#line 1186 "parserbison.tab.c"
+#line 1210 "parserbison.tab.c"
     break;
 
   case 12: /* asignacion: ID '=' E  */
-#line 98 "parserbison.y"
+#line 116 "parserbison.y"
                       { 
                 (yyval.node) = createNode("=",0,NULL,NULL);
                 (yyval.node)->left = createNode("ID",0,NULL,NULL);
                 (yyval.node)->left->name = (yyvsp[-2].id); 
                 (yyval.node)->right = (yyvsp[0].node); 
             }
-#line 1197 "parserbison.tab.c"
-    break;
-
-  case 13: /* T: T_INT  */
-#line 106 "parserbison.y"
-          { (yyval.node) = createNode("T_INT", 0, NULL, NULL); }
-#line 1203 "parserbison.tab.c"
-    break;
-
-  case 14: /* T: T_BOOL  */
-#line 107 "parserbison.y"
-             { (yyval.node) = createNode("T_BOOL", 0, NULL, NULL); }
-#line 1209 "parserbison.tab.c"
-    break;
-
-  case 15: /* T: T_VOID  */
-#line 108 "parserbison.y"
-             { (yyval.node) = createNode("T_VOID", 0, NULL, NULL); }
-#line 1215 "parserbison.tab.c"
-    break;
-
-  case 16: /* E: E '+' E  */
-#line 113 "parserbison.y"
-              { (yyval.node) = createNode("+",0,(yyvsp[-2].node),(yyvsp[0].node)); }
 #line 1221 "parserbison.tab.c"
     break;
 
-  case 17: /* E: E '*' E  */
-#line 115 "parserbison.y"
-                { (yyval.node) = createNode("*",0,(yyvsp[-2].node),(yyvsp[0].node)); }
+  case 13: /* T: T_INT  */
+#line 124 "parserbison.y"
+          { (yyval.node) = createNode("T_INT", 0, NULL, NULL); }
 #line 1227 "parserbison.tab.c"
     break;
 
-  case 18: /* E: '(' E ')'  */
-#line 117 "parserbison.y"
-                { (yyval.node) = (yyvsp[-1].node); }
+  case 14: /* T: T_BOOL  */
+#line 125 "parserbison.y"
+             { (yyval.node) = createNode("T_BOOL", 0, NULL, NULL); }
 #line 1233 "parserbison.tab.c"
     break;
 
-  case 19: /* E: E OR E  */
-#line 119 "parserbison.y"
-                { (yyval.node) = createNode("OR",0,(yyvsp[-2].node),(yyvsp[0].node)); }
+  case 15: /* T: T_VOID  */
+#line 126 "parserbison.y"
+             { (yyval.node) = createNode("T_VOID", 0, NULL, NULL); }
 #line 1239 "parserbison.tab.c"
     break;
 
-  case 20: /* E: E AND E  */
-#line 121 "parserbison.y"
-                { (yyval.node) = createNode("AND",0,(yyvsp[-2].node),(yyvsp[0].node)); }
+  case 16: /* E: E '+' E  */
+#line 131 "parserbison.y"
+              { (yyval.node) = createNode("+",0,(yyvsp[-2].node),(yyvsp[0].node)); }
 #line 1245 "parserbison.tab.c"
     break;
 
-  case 21: /* E: '!' E  */
-#line 123 "parserbison.y"
-            { (yyval.node) = createNode("!",0,(yyvsp[0].node),NULL); }
+  case 17: /* E: E '*' E  */
+#line 133 "parserbison.y"
+                { (yyval.node) = createNode("*",0,(yyvsp[-2].node),(yyvsp[0].node)); }
 #line 1251 "parserbison.tab.c"
     break;
 
+  case 18: /* E: '(' E ')'  */
+#line 135 "parserbison.y"
+                { (yyval.node) = createNode("()",0,(yyvsp[-1].node),NULL); }
+#line 1257 "parserbison.tab.c"
+    break;
+
+  case 19: /* E: E OR E  */
+#line 137 "parserbison.y"
+                { (yyval.node) = createNode("OR",0,(yyvsp[-2].node),(yyvsp[0].node)); }
+#line 1263 "parserbison.tab.c"
+    break;
+
+  case 20: /* E: E AND E  */
+#line 139 "parserbison.y"
+                { (yyval.node) = createNode("AND",0,(yyvsp[-2].node),(yyvsp[0].node)); }
+#line 1269 "parserbison.tab.c"
+    break;
+
+  case 21: /* E: '!' E  */
+#line 141 "parserbison.y"
+            { (yyval.node) = createNode("!",0,(yyvsp[0].node),NULL); }
+#line 1275 "parserbison.tab.c"
+    break;
+
   case 22: /* E: ID  */
-#line 125 "parserbison.y"
+#line 143 "parserbison.y"
          { (yyval.node) = createNode("ID",0,NULL,NULL);
             (yyval.node)->name = (yyvsp[0].id); }
-#line 1258 "parserbison.tab.c"
+#line 1282 "parserbison.tab.c"
     break;
 
   case 23: /* E: INT  */
-#line 128 "parserbison.y"
+#line 146 "parserbison.y"
           { (yyval.node) = createNode("INT",(yyvsp[0].num),NULL,NULL); }
-#line 1264 "parserbison.tab.c"
+#line 1288 "parserbison.tab.c"
     break;
 
   case 24: /* E: TRUE  */
-#line 130 "parserbison.y"
+#line 148 "parserbison.y"
            { (yyval.node) = createNode("TRUE",1,NULL,NULL); }
-#line 1270 "parserbison.tab.c"
+#line 1294 "parserbison.tab.c"
     break;
 
   case 25: /* E: FALSE  */
-#line 132 "parserbison.y"
+#line 150 "parserbison.y"
             { (yyval.node) = createNode("FALSE",0,NULL,NULL); }
-#line 1276 "parserbison.tab.c"
+#line 1300 "parserbison.tab.c"
     break;
 
 
-#line 1280 "parserbison.tab.c"
+#line 1304 "parserbison.tab.c"
 
       default: break;
     }
@@ -1469,5 +1493,5 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 134 "parserbison.y"
+#line 152 "parserbison.y"
 

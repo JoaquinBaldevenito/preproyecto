@@ -28,11 +28,23 @@ void printTree(Tree *n, int level) {
     for (int i=0; i<level; i++) printf("  ");
     if (strcmp(n->tipo,"INT")==0)
         printf("%s(%d)\n", n->tipo, n->value);
+    else if (strcmp(n->tipo,"ID")==0)
+        printf("%s(%s)\n", n->tipo, n->name);
     else
         printf("%s\n", n->tipo);
-    printTree(n->left, level+1);
-    printTree(n->right, level+1);
+
+    if(n->left) {
+        for(int i=0;i<=level;i++) printf("  "); 
+        printf("left:\n");
+        printTree(n->left, level+2);
+    }
+    if(n->right) {
+        for(int i=0;i<=level;i++) printf("  ");
+        printf("right:\n");
+        printTree(n->right, level+2);
+    }
 }
+
 
 %}
 
@@ -81,7 +93,13 @@ programa : T MAIN '(' ')' bloque  {
 
 bloque : '{' lista_sentencias '}' {$$ = createNode("bloque", 0, $2, NULL);}
         ;
-lista_sentencias : sentencia  lista_sentencias
+lista_sentencias : sentencia  lista_sentencias { 
+                                                    if ($2 == NULL) $$ = $1; 
+                                                    else {
+                                                        Tree *n = createNode("list", 0, $1, $2);
+                                                        $$ = n;
+                                                    }
+                                                }
                 | {$$ = NULL;}  /* epsilon */
                 ;
 
@@ -114,7 +132,7 @@ E   : E '+' E { $$ = createNode("+",0,$1,$3); }
 
     | E '*' E   { $$ = createNode("*",0,$1,$3); }
 
-    | '(' E ')' { $$ = $2; }
+    | '(' E ')' { $$ = createNode("()",0,$2,NULL); }
 
     | E OR E    { $$ = createNode("OR",0,$1,$3); }
 
