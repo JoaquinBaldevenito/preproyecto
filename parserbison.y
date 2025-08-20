@@ -73,7 +73,7 @@ void printTree(Tree *n, int level) {
 %type <node> E T 
 
 /* ==== Bloques, sentencias y declaraciones ==== */
-%type <node> programa bloque lista_sentencias sentencia declaracion asignacion
+%type <node> programa resto args parameters bloque lista_sentencias sentencia declaracion asignacion
 
 /* ==== Precedencia y asociatividad ==== */
 
@@ -85,11 +85,24 @@ void printTree(Tree *n, int level) {
 %right '!'
 
 %%
-programa : T MAIN '(' ')' bloque  { 
-                                    printf("No hay errores \n");
-                                    printTree($5, 0);
-                                    }
+programa : T MAIN resto{ 
+                        printf("No hay errores \n");
+                        {$$ = createNode("programa", 0, $1, $3);}
+                        printTree($$, 0);
+                        }
         ;
+
+resto : args bloque { $$ = createNode("resto", 0, $1, $2);};
+
+args : '(' parameters ')' {$$ = createNode("()", 0, $2, NULL);};
+
+parameters : declaracion
+            | declaracion ',' parameters { 
+                Tree *n = createNode("list", 0, $1, $3);
+                $$ = n;
+            } 
+            | {$$ = NULL;} /* epsilon */
+            ;
 
 bloque : '{' lista_sentencias '}' {$$ = createNode("bloque", 0, $2, NULL);}
         ;
@@ -109,7 +122,11 @@ sentencia : declaracion ';'
           | RETURN ';' {$$ = createNode("RETURN", 0, NULL, NULL);}
           ;
 
-declaracion : T ID 
+declaracion : T ID {Tree* aux = createNode("ID", 0, NULL, NULL);
+                    aux->name = $2;
+                    $$ = createNode("declaracion", 0, $1, aux);
+                    $$->left->name = $2; 
+                  }
             | T asignacion
             ;
 
