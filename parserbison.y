@@ -106,6 +106,10 @@ E   : E '+' E { $$ = createNode(NODE_SUM,0,$1,$3); }
 
     | E '*' E   { $$ = createNode(NODE_MUL,0,$1,$3); }
 
+    | E '-' E   { $$ = createNode(NODE_RES,0,$1,$3); }
+    
+    | E '/' E   { $$ = createNode(NODE_DIV,0,$1,$3); }
+
     | '(' E ')' { $$ = createNode(NODE_PARENS,0,$2,NULL); }
 
     | E OR E    { $$ = createNode(NODE_OR,0,$1,$3); }
