@@ -46,6 +46,8 @@ void printTree(Tree *n, int level) {
           case NODE_ID:    return "ID";
           case NODE_PLUS:  return "PLUS";
           case NODE_MUL:   return "*";
+          case NODE_RES:   return "-";
+          case NODE_DIV:   return "/";
           case NODE_PROGRAM: return "PROGRAM";
           case NODE_RESTO: return "RESTO";
           case NODE_ARGS:  return "ARGS";

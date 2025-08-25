@@ -1,0 +1,5 @@
+int main(int x, int y) {
+    int suma = x + y;
+    bool check = (suma || 0) && true;
+    return suma;
+}

@@ -1,3 +1,5 @@
+#ifndef TREE_H
+#define TREE_H
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -27,6 +29,8 @@ typedef enum{
     NODE_NOT,
     NODE_PARENS,
     NODE_SUM,
+    NODE_RES,
+    NODE_DIV,
     NODE_EQ,
     NODE_NEQ,
     NODE_LE,
@@ -46,3 +50,5 @@ typedef struct Tree {
 Tree* createNode(typeTree tipo, int value, Tree *left, Tree *right);
 void printTree(Tree *n, int level);
 const char* tipoToStr(typeTree t);
+
+#endif /* TREE_H */

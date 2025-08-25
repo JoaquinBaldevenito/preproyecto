@@ -1,0 +1,6 @@
+int main(int a, int b, bool flag) {
+    int res = (a * b) + (a - b) * (a + b);
+    bool check = flag && (res != 0);
+    res = res + 1;
+    return res;
+}
