@@ -4,9 +4,9 @@
 #include "Tree.h"
 struct Tree;  /* forward declaration */
 
-Tree* createNode(char *tipo, int value, Tree *left, Tree *right) {
+Tree* createNode(typeTree tipo, int value, Tree *left, Tree *right) {
     Tree *n = malloc(sizeof(Tree));
-    n->tipo = strdup(tipo);
+    n->tipo = tipo;
     n->value = value;
     n->name = NULL;
     n->left = left;
@@ -16,13 +16,20 @@ Tree* createNode(char *tipo, int value, Tree *left, Tree *right) {
 
 void printTree(Tree *n, int level) {
     if (!n) return;
+    
     for (int i=0; i<level; i++) printf("  ");
-    if (strcmp(n->tipo,"INT")==0)
-        printf("%s(%d)\n", n->tipo, n->value);
-    else if (strcmp(n->tipo,"ID")==0)
-        printf("%s(%s)\n", n->tipo, n->name);
+    
+    const char *tipo = tipoToStr(n->tipo); // Convert enum to string    
+    if (n->tipo == NODE_T_INT)
+        printf("%s(%d)\n", tipo, n->value);
+    else if (n->tipo == NODE_ID)
+        printf("%s(%s)\n", tipo, n->name);
+    else if (n->tipo == NODE_MUL)
+        printf("%s(%s)\n", tipo, n->name);
+    else if (n->tipo == NODE_PLUS)
+        printf("%s(%s)\n", tipo, n->name);
     else
-        printf("%s\n", n->tipo);
+        printf("%s\n", tipo);
 
     if(n->left) {
         for(int i=0;i<=level;i++) printf("  "); 
@@ -34,5 +41,32 @@ void printTree(Tree *n, int level) {
         printf("right:\n");
         printTree(n->right, level+2);
     }
-}
+  }
+
+    const char* tipoToStr(typeTree t) {
+      switch (t) {
+          case NODE_ID:    return "ID";
+          case NODE_PLUS:  return "PLUS";
+          case NODE_MUL:   return "*";
+          case NODE_PROGRAM: return "PROGRAM";
+          case NODE_RESTO: return "RESTO";
+          case NODE_ARGS:  return "ARGS";
+          case NODE_LIST:  return "LIST";
+          case NODE_BLOCK: return "BLOCK";
+          case NODE_RETURN: return "RETURN";
+          case NODE_DECLARATION: return "DECLARATION";
+          case NODE_ASSIGN: return "=";
+          case NODE_TRUE:  return "TRUE";
+          case NODE_FALSE: return "FALSE";
+          case NODE_T_INT: return "T_INT";
+          case NODE_T_BOOL: return "T_BOOL";
+          case NODE_T_VOID: return "T_VOID";
+          case NODE_OR:    return "OR";
+          case NODE_AND:   return "AND";
+          case NODE_NOT:   return "¬";
+          case NODE_PARENS: return "()";
+          case NODE_SUM:   return "+";
+          default:         return "STRING";
+      }
+    }
 

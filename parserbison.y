@@ -44,29 +44,29 @@
 %%
 programa : T MAIN resto{ 
                         printf("No hay errores \n");
-                        {$$ = createNode("programa", 0, $1, $3);}
+                        {$$ = createNode(NODE_PROGRAM, 0, $1, $3);}
                         printTree($$, 0);
                         }
         ;
 
-resto : args bloque { $$ = createNode("resto", 0, $1, $2);};
+resto : args bloque { $$ = createNode(NODE_RESTO, 0, $1, $2);};
 
-args : '(' parameters ')' {$$ = createNode("()", 0, $2, NULL);};
+args : '(' parameters ')' {$$ = createNode(NODE_PARENS, 0, $2, NULL);};
 
 parameters : declaracion
             | declaracion ',' parameters { 
-                Tree *n = createNode("list", 0, $1, $3);
+                Tree *n = createNode(NODE_LIST, 0, $1, $3);
                 $$ = n;
             } 
             | {$$ = NULL;} /* epsilon */
             ;
 
-bloque : '{' lista_sentencias '}' {$$ = createNode("bloque", 0, $2, NULL);}
+bloque : '{' lista_sentencias '}' {$$ = createNode(NODE_BLOCK, 0, $2, NULL);}
         ;
 lista_sentencias : sentencia  lista_sentencias { 
                                                     if ($2 == NULL) $$ = $1; 
                                                     else {
-                                                        Tree *n = createNode("list", 0, $1, $2);
+                                                        Tree *n = createNode(NODE_LIST, 0, $1, $2);
                                                         $$ = n;
                                                     }
                                                 }
@@ -75,52 +75,52 @@ lista_sentencias : sentencia  lista_sentencias {
 
 sentencia : declaracion ';'
           | asignacion ';'
-          | RETURN E ';' {$$ = createNode("RETURN", 0, $2, NULL);}
-          | RETURN ';' {$$ = createNode("RETURN", 0, NULL, NULL);}
+          | RETURN E ';' {$$ = createNode(NODE_RETURN, 0, $2, NULL);}
+          | RETURN ';' {$$ = createNode(NODE_RETURN, 0, NULL, NULL);}
           ;
 
-declaracion : T ID {Tree* aux = createNode("ID", 0, NULL, NULL);
+declaracion : T ID {Tree* aux = createNode(NODE_ID, 0, NULL, NULL);
                     aux->name = $2;
-                    $$ = createNode("declaracion", 0, $1, aux);
+                    $$ = createNode(NODE_DECLARATION, 0, $1, aux);
                     $$->left->name = $2; 
                   }
             | T asignacion
             ;
 
 asignacion : ID '=' E { 
-                $$ = createNode("=",0,NULL,NULL);
-                $$->left = createNode("ID",0,NULL,NULL);
+                $$ = createNode(NODE_ASSIGN,0,NULL,NULL);
+                $$->left = createNode(NODE_ID,0,NULL,NULL);
                 $$->left->name = $1; 
                 $$->right = $3; 
             }
            ;
 
-T : T_INT { $$ = createNode("T_INT", 0, NULL, NULL); }
-    | T_BOOL { $$ = createNode("T_BOOL", 0, NULL, NULL); }
-    | T_VOID { $$ = createNode("T_VOID", 0, NULL, NULL); }
+T : T_INT { $$ = createNode(NODE_T_INT, 0, NULL, NULL); }
+    | T_BOOL { $$ = createNode(NODE_T_BOOL, 0, NULL, NULL); }
+    | T_VOID { $$ = createNode(NODE_T_VOID, 0, NULL, NULL); }
     ;
 
 
 
-E   : E '+' E { $$ = createNode("+",0,$1,$3); }
+E   : E '+' E { $$ = createNode(NODE_SUM,0,$1,$3); }
 
-    | E '*' E   { $$ = createNode("*",0,$1,$3); }
+    | E '*' E   { $$ = createNode(NODE_MUL,0,$1,$3); }
 
-    | '(' E ')' { $$ = createNode("()",0,$2,NULL); }
+    | '(' E ')' { $$ = createNode(NODE_PARENS,0,$2,NULL); }
 
-    | E OR E    { $$ = createNode("OR",0,$1,$3); }
+    | E OR E    { $$ = createNode(NODE_OR,0,$1,$3); }
 
-    | E AND E   { $$ = createNode("AND",0,$1,$3); }
+    | E AND E   { $$ = createNode(NODE_AND,0,$1,$3); }
 
-    | '!' E { $$ = createNode("!",0,$2,NULL); }
+    | '!' E { $$ = createNode(NODE_NOT,0,$2,NULL); }
 
-    | ID { $$ = createNode("ID",0,NULL,NULL);
+    | ID { $$ = createNode(NODE_ID,0,NULL,NULL);
             $$->name = $1; }
 
-    | INT { $$ = createNode("INT",$1,NULL,NULL); }
+    | INT { $$ = createNode(NODE_T_INT,$1,NULL,NULL); }
 
-    | TRUE { $$ = createNode("TRUE",1,NULL,NULL); }
+    | TRUE { $$ = createNode(NODE_TRUE,1,NULL,NULL); }
 
-    | FALSE { $$ = createNode("FALSE",0,NULL,NULL); }
+    | FALSE { $$ = createNode(NODE_FALSE,0,NULL,NULL); }
     ;
 %%
