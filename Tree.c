@@ -66,6 +66,12 @@ void printTree(Tree *n, int level) {
           case NODE_NOT:   return "¬";
           case NODE_PARENS: return "()";
           case NODE_SUM:   return "+";
+          case NODE_EQ:   return "==";
+          case NODE_NEQ:   return "!=";
+          case NODE_LE:   return "<=";
+          case NODE_LT:   return "<";
+          case NODE_GE:   return ">=";
+          case NODE_GT:   return ">";
           default:         return "STRING";
       }
     }

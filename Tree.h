@@ -27,6 +27,12 @@ typedef enum{
     NODE_NOT,
     NODE_PARENS,
     NODE_SUM,
+    NODE_EQ,
+    NODE_NEQ,
+    NODE_LE,
+    NODE_LT,
+    NODE_GE,
+    NODE_GT,
 } typeTree;
 
 typedef struct Tree {

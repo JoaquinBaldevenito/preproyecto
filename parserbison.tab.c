@@ -606,9 +606,9 @@ static const yytype_int8 yydefact[] =
        0,     0,     5,     0,    10,     3,     4,     7,    15,    16,
        0,     0,     0,    10,     0,     0,     6,     0,    34,    35,
       36,    33,     0,     0,    14,     0,     8,     9,    11,    12,
-      17,    32,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,    13,    23,    24,    25,    26,    27,    28,
-      29,    30,    31,    21,    22
+      17,    26,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,    13,    23,    24,    25,    27,    28,    29,
+      30,    31,    32,    21,    22
 };
 
 /* YYPGOTO[NTERM-NUM].  */
@@ -685,8 +685,8 @@ static const yytype_int8 yyr2[] =
 {
        0,     2,     3,     2,     3,     1,     3,     0,     3,     2,
        0,     2,     2,     3,     2,     2,     2,     3,     1,     1,
-       1,     3,     3,     3,     3,     3,     3,     3,     3,     3,
-       3,     3,     2,     1,     1,     1,     1
+       1,     3,     3,     3,     3,     3,     2,     3,     3,     3,
+       3,     3,     3,     1,     1,     1,     1
 };
 
 
@@ -1162,13 +1162,13 @@ yyreduce:
   case 3: /* resto: args bloque  */
 #line 52 "parserbison.y"
                     { (yyval.node) = createNode(NODE_RESTO, 0, (yyvsp[-1].node), (yyvsp[0].node));}
-#line 1150 "parserbison.tab.c"
+#line 1166 "parserbison.tab.c"
     break;
 
   case 4: /* args: '(' parameters ')'  */
 #line 54 "parserbison.y"
                           {(yyval.node) = createNode(NODE_PARENS, 0, (yyvsp[-1].node), NULL);}
-#line 1156 "parserbison.tab.c"
+#line 1172 "parserbison.tab.c"
     break;
 
   case 6: /* parameters: declaracion ',' parameters  */
@@ -1189,7 +1189,7 @@ yyreduce:
   case 8: /* bloque: '{' lista_sentencias '}'  */
 #line 64 "parserbison.y"
                                   {(yyval.node) = createNode(NODE_BLOCK, 0, (yyvsp[-1].node), NULL);}
-#line 1177 "parserbison.tab.c"
+#line 1193 "parserbison.tab.c"
     break;
 
   case 9: /* lista_sentencias: sentencia lista_sentencias  */
@@ -1212,16 +1212,14 @@ yyreduce:
 
   case 13: /* sentencia: RETURN E ';'  */
 #line 78 "parserbison.y"
-
                          {(yyval.node) = createNode(NODE_RETURN, 0, (yyvsp[-1].node), NULL);}
-#line 1201 "parserbison.tab.c"
+#line 1217 "parserbison.tab.c"
     break;
 
   case 14: /* sentencia: RETURN ';'  */
 #line 79 "parserbison.y"
-
                        {(yyval.node) = createNode(NODE_RETURN, 0, NULL, NULL);}
-#line 1207 "parserbison.tab.c"
+#line 1223 "parserbison.tab.c"
     break;
 
   case 15: /* declaracion: T ID  */
@@ -1248,80 +1246,116 @@ yyreduce:
   case 18: /* T: T_INT  */
 #line 98 "parserbison.y"
           { (yyval.node) = createNode(NODE_T_INT, 0, NULL, NULL); }
-#line 1234 "parserbison.tab.c"
+#line 1250 "parserbison.tab.c"
     break;
 
   case 19: /* T: T_BOOL  */
 #line 99 "parserbison.y"
              { (yyval.node) = createNode(NODE_T_BOOL, 0, NULL, NULL); }
-#line 1240 "parserbison.tab.c"
+#line 1256 "parserbison.tab.c"
     break;
 
   case 20: /* T: T_VOID  */
 #line 100 "parserbison.y"
              { (yyval.node) = createNode(NODE_T_VOID, 0, NULL, NULL); }
-#line 1246 "parserbison.tab.c"
+#line 1262 "parserbison.tab.c"
     break;
 
   case 21: /* E: E '+' E  */
 #line 105 "parserbison.y"
               { (yyval.node) = createNode(NODE_SUM,0,(yyvsp[-2].node),(yyvsp[0].node)); }
-#line 1252 "parserbison.tab.c"
+#line 1268 "parserbison.tab.c"
     break;
 
   case 22: /* E: E '*' E  */
 #line 107 "parserbison.y"
                 { (yyval.node) = createNode(NODE_MUL,0,(yyvsp[-2].node),(yyvsp[0].node)); }
-#line 1258 "parserbison.tab.c"
+#line 1274 "parserbison.tab.c"
     break;
 
   case 23: /* E: '(' E ')'  */
 #line 109 "parserbison.y"
                 { (yyval.node) = createNode(NODE_PARENS,0,(yyvsp[-1].node),NULL); }
-#line 1264 "parserbison.tab.c"
+#line 1280 "parserbison.tab.c"
     break;
 
   case 24: /* E: E OR E  */
 #line 111 "parserbison.y"
                 { (yyval.node) = createNode(NODE_OR,0,(yyvsp[-2].node),(yyvsp[0].node)); }
-#line 1270 "parserbison.tab.c"
+#line 1286 "parserbison.tab.c"
     break;
 
   case 25: /* E: E AND E  */
 #line 113 "parserbison.y"
                 { (yyval.node) = createNode(NODE_AND,0,(yyvsp[-2].node),(yyvsp[0].node)); }
-#line 1276 "parserbison.tab.c"
+#line 1292 "parserbison.tab.c"
     break;
 
-  case 26: /* E: E EQ E  */
+  case 26: /* E: '!' E  */
 #line 115 "parserbison.y"
             { (yyval.node) = createNode(NODE_NOT,0,(yyvsp[0].node),NULL); }
-#line 1282 "parserbison.tab.c"
+#line 1298 "parserbison.tab.c"
     break;
 
-  case 27: /* E: E NEQ E  */
+  case 27: /* E: E EQ E  */
 #line 117 "parserbison.y"
+               { (yyval.node) = createNode(NODE_EQ,0,(yyvsp[-2].node),(yyvsp[0].node)); }
+#line 1304 "parserbison.tab.c"
+    break;
+
+  case 28: /* E: E NEQ E  */
+#line 119 "parserbison.y"
+                { (yyval.node) = createNode(NODE_NEQ,0,(yyvsp[-2].node),(yyvsp[0].node)); }
+#line 1310 "parserbison.tab.c"
+    break;
+
+  case 29: /* E: E LE E  */
+#line 121 "parserbison.y"
+               { (yyval.node) = createNode(NODE_LE,0,(yyvsp[-2].node),(yyvsp[0].node)); }
+#line 1316 "parserbison.tab.c"
+    break;
+
+  case 30: /* E: E GE E  */
+#line 123 "parserbison.y"
+               { (yyval.node) = createNode(NODE_GE,0,(yyvsp[-2].node),(yyvsp[0].node)); }
+#line 1322 "parserbison.tab.c"
+    break;
+
+  case 31: /* E: E '<' E  */
+#line 125 "parserbison.y"
+                { (yyval.node) = createNode(NODE_LT,0,(yyvsp[-2].node),(yyvsp[0].node)); }
+#line 1328 "parserbison.tab.c"
+    break;
+
+  case 32: /* E: E '>' E  */
+#line 127 "parserbison.y"
+                { (yyval.node) = createNode(NODE_GT,0,(yyvsp[-2].node),(yyvsp[0].node)); }
+#line 1334 "parserbison.tab.c"
+    break;
+
+  case 33: /* E: ID  */
+#line 129 "parserbison.y"
          { (yyval.node) = createNode(NODE_ID,0,NULL,NULL);
             (yyval.node)->name = (yyvsp[0].id); }
 #line 1341 "parserbison.tab.c"
     break;
 
-  case 28: /* E: INT  */
-#line 120 "parserbison.y"
+  case 34: /* E: INT  */
+#line 132 "parserbison.y"
           { (yyval.node) = createNode(NODE_T_INT,(yyvsp[0].num),NULL,NULL); }
-#line 1295 "parserbison.tab.c"
+#line 1347 "parserbison.tab.c"
     break;
 
-  case 29: /* E: TRUE  */
-#line 122 "parserbison.y"
+  case 35: /* E: TRUE  */
+#line 134 "parserbison.y"
            { (yyval.node) = createNode(NODE_TRUE,1,NULL,NULL); }
-#line 1301 "parserbison.tab.c"
+#line 1353 "parserbison.tab.c"
     break;
 
-  case 30: /* E: FALSE  */
-#line 124 "parserbison.y"
+  case 36: /* E: FALSE  */
+#line 136 "parserbison.y"
             { (yyval.node) = createNode(NODE_FALSE,0,NULL,NULL); }
-#line 1307 "parserbison.tab.c"
+#line 1359 "parserbison.tab.c"
     break;
 
 
