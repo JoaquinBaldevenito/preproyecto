@@ -16,36 +16,37 @@ LETRA       [a-zA-Z]
 ID          [a-z][a-zA-Z0-9]*
 NUMERO      0|[1-9][0-9]*
 
-    /* ======== PATRONES Y ACCIONES ========== */
-%%
-"main"              {printf("main : %s\n",yytext); return MAIN; }
-"int"               {printf("int : %s\n",yytext); return T_INT; }
-"bool"              {printf("bool : %s\n",yytext); return T_BOOL; }
-"void"              {printf("void : %s\n",yytext); return T_VOID; }
-"return"            {printf("return : %s\n",yytext); return RETURN; }
-"if"                {printf("if : %s\n",yytext); return IF; }
-"else"              {printf("else : %s\n",yytext); return ELSE; }
-"while"             {printf("while : %s\n",yytext); return WHILE; }
-"true"              {printf("true : %s\n",yytext); return TRUE; }
-"false"             {printf("false : %s\n",yytext); return FALSE; }
+    /* ======== PATRONES Y |ACCIONES ========== */
+%%|
+"main"              {   return MAIN;    }
+"int"               {   return T_INT;    }
+"bool"              {   return T_BOOL;    }
+"void"              {   return T_VOID;    }
+"return"            {   return RETURN;    }
+"if"                {   return IF;    }
+"else"              {   return ELSE;    }
+"while"             {   return WHILE;    }
+"true"              {   return TRUE;    }
+"false"             {   return FALSE;    }
 
     /* Números */
-{NUMERO}            {printf("INT : %d\n",atoi(yytext));
+{NUMERO}            {
+                    yylval.num = atoi(yytext);
                     return INT; }
 
     /* Identificadores */
-{ID}                {printf("ID : %s\n",yytext);
+{ID}                {
+                    yylval.id = strdup(yytext);
                     return ID; }
 
     /* Operadores de un solo carácter y delimitadores */
-[+*;(){}=!]         { printf("%s\n", yytext); 
-                    return *yytext; }
+[+*;(){}=!,-/]         {   return *yytext;    }
 
     /* Operadores de dos caracteres */
-"||"          { printf("%s\n", yytext); return OR; }
-"&&"          { printf("%s\n", yytext); return AND; }
-"=="          { printf("%s\n", yytext); return EQ; }
-"!="          { printf("%s\n", yytext); return NEQ; }
+"||"          {   return OR;    }
+"&&"          {   return AND;   }
+"=="          {   return EQ;    }
+"!="          {   return NEQ;   }
 
 
     /* Ignorar espacios y tabs */

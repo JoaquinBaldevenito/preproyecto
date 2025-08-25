@@ -2,83 +2,168 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
+struct Tree;  /* forward declaration */
+
+typedef struct Tree {
+    char *tipo;            /* nombre del nodo: "INT", "+", "*" ... */
+    int value;             /* usado si es número */
+    char *name;           /* usado si es identificador */
+    struct Tree *left;
+    struct Tree *right;
+}Tree;
+
+Tree* createNode(char *tipo, int value, Tree *left, Tree *right) {
+    Tree *n = malloc(sizeof(Tree));
+    n->tipo = strdup(tipo);
+    n->value = value;
+    n->name = NULL;
+    n->left = left;
+    n->right = right;
+    return n;
+}
+
+void printTree(Tree *n, int level) {
+    if (!n) return;
+    for (int i=0; i<level; i++) printf("  ");
+    if (strcmp(n->tipo,"INT")==0)
+        printf("%s(%d)\n", n->tipo, n->value);
+    else if (strcmp(n->tipo,"ID")==0)
+        printf("%s(%s)\n", n->tipo, n->name);
+    else
+        printf("%s\n", n->tipo);
+
+    if(n->left) {
+        for(int i=0;i<=level;i++) printf("  "); 
+        printf("left:\n");
+        printTree(n->left, level+2);
+    }
+    if(n->right) {
+        for(int i=0;i<=level;i++) printf("  ");
+        printf("right:\n");
+        printTree(n->right, level+2);
+    }
+}
+
 
 %}
 
+%union {
+    int num;    /* para INT */
+    char* id;   /* para ID */
+    struct Tree* node;  /* para expresiones */
+}
+
 /* Palabras Reservadas*/
-%token MAIN INT BOOL VOID RETURN IF ELSE WHILE T_INT T_BOOL T_VOID
+%token MAIN BOOL VOID RETURN IF ELSE WHILE T_INT T_BOOL T_VOID
+
+%token <num> INT /* Números enteros */
 
 /* Constantes Booleanas */
-%token TRUE FALSE
+%token <num> TRUE FALSE
 
 /* Operadores */
 %token OR AND EQ NEQ 
 
 /* Numeros e identificadores */
-%token NUM
-%token ID
+%token <num> NUM
+%token <id>ID
 
 /* ==== No terminales con tipo ==== */
-%type E
-%type T
+%type <node> E T 
+
+/* ==== Bloques, sentencias y declaraciones ==== */
+%type <node> programa resto args parameters bloque lista_sentencias sentencia declaracion asignacion
 
 /* ==== Precedencia y asociatividad ==== */
 
 %left OR
 %left AND
 %left EQ NEQ
-%left '+'
-%left '*'
+%left '+' '-'
+%left '*' '/'
 %right '!'
 
 %%
-programa : T MAIN '(' ')' bloque  { printf("No hay errores \n"); }
+programa : T MAIN resto{ 
+                        printf("No hay errores \n");
+                        {$$ = createNode("programa", 0, $1, $3);}
+                        printTree($$, 0);
+                        }
         ;
 
-bloque : '{' lista_sentencias '}'
+resto : args bloque { $$ = createNode("resto", 0, $1, $2);};
+
+args : '(' parameters ')' {$$ = createNode("()", 0, $2, NULL);};
+
+parameters : declaracion
+            | declaracion ',' parameters { 
+                Tree *n = createNode("list", 0, $1, $3);
+                $$ = n;
+            } 
+            | {$$ = NULL;} /* epsilon */
+            ;
+
+bloque : '{' lista_sentencias '}' {$$ = createNode("bloque", 0, $2, NULL);}
         ;
-lista_sentencias : sentencia  lista_sentencias
-                | /* epsilon */
+lista_sentencias : sentencia  lista_sentencias { 
+                                                    if ($2 == NULL) $$ = $1; 
+                                                    else {
+                                                        Tree *n = createNode("list", 0, $1, $2);
+                                                        $$ = n;
+                                                    }
+                                                }
+                | {$$ = NULL;}  /* epsilon */
                 ;
 
 sentencia : declaracion ';'
           | asignacion ';'
-          | RETURN E ';'
-          | RETURN ';'
+          | RETURN E ';' {$$ = createNode("RETURN", 0, $2, NULL);}
+          | RETURN ';' {$$ = createNode("RETURN", 0, NULL, NULL);}
           ;
 
-declaracion : T ID 
+declaracion : T ID {Tree* aux = createNode("ID", 0, NULL, NULL);
+                    aux->name = $2;
+                    $$ = createNode("declaracion", 0, $1, aux);
+                    $$->left->name = $2; 
+                  }
             | T asignacion
             ;
 
-asignacion : ID '=' E
+asignacion : ID '=' E { 
+                $$ = createNode("=",0,NULL,NULL);
+                $$->left = createNode("ID",0,NULL,NULL);
+                $$->left->name = $1; 
+                $$->right = $3; 
+            }
            ;
 
-T : T_INT
-    | T_BOOL
-    | T_VOID
+T : T_INT { $$ = createNode("T_INT", 0, NULL, NULL); }
+    | T_BOOL { $$ = createNode("T_BOOL", 0, NULL, NULL); }
+    | T_VOID { $$ = createNode("T_VOID", 0, NULL, NULL); }
     ;
 
 
 
-E   : E '+' E
+E   : E '+' E { $$ = createNode("+",0,$1,$3); }
 
-    | E '*' E
+    | E '*' E   { $$ = createNode("*",0,$1,$3); }
 
-    | '(' E ')'
+    | '(' E ')' { $$ = createNode("()",0,$2,NULL); }
 
-    | E OR E
+    | E OR E    { $$ = createNode("OR",0,$1,$3); }
 
-    | E AND E
+    | E AND E   { $$ = createNode("AND",0,$1,$3); }
 
-    | '!' E
+    | '!' E { $$ = createNode("!",0,$2,NULL); }
 
-    | ID
+    | ID { $$ = createNode("ID",0,NULL,NULL);
+            $$->name = $1; }
 
-    | INT
+    | INT { $$ = createNode("INT",$1,NULL,NULL); }
 
-    | TRUE
+    | TRUE { $$ = createNode("TRUE",1,NULL,NULL); }
 
-    | FALSE 
+    | FALSE { $$ = createNode("FALSE",0,NULL,NULL); }
     ;
 %%

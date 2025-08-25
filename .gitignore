@@ -1,0 +1,3 @@
+*.tab.*
+act1
+lex.yy.c
