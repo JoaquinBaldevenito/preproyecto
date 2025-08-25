@@ -29,7 +29,12 @@ E → E + E
     | !E
     | false
     | true
-
+    | E < E
+    | E > E 
+    | E <= E
+    | E >= E
+    | E == E
+    | E != E
 --2 Expresiones regulares
 
 --Palabras Reservadas
@@ -43,7 +48,7 @@ constante -> false | true
 nro -> 0 | [1-9][0-9]*
 
 --Operadores
-operador -> + | * | = | || | && | ! | == | != 
+operador -> + | * | = | || | && | ! | == | != | < | >
 
 --Delimitadores
 delimitadores -> ; | { | } | ( | ) 
