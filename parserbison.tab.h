@@ -71,8 +71,10 @@ extern int yydebug;
     AND = 272,                     /* AND  */
     EQ = 273,                      /* EQ  */
     NEQ = 274,                     /* NEQ  */
-    NUM = 275,                     /* NUM  */
-    ID = 276                       /* ID  */
+    LE = 275,                      /* LE  */
+    GE = 276,                      /* GE  */
+    NUM = 277,                     /* NUM  */
+    ID = 278                       /* ID  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -87,7 +89,7 @@ union YYSTYPE
     char* id;   /* para ID */
     struct Tree* node;  /* para expresiones */
 
-#line 91 "parserbison.tab.h"
+#line 93 "parserbison.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

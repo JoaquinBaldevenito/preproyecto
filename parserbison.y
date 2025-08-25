@@ -20,7 +20,7 @@
 %token <num> TRUE FALSE
 
 /* Operadores */
-%token OR AND EQ NEQ 
+%token OR AND EQ NEQ LE GE
 
 /* Numeros e identificadores */
 %token <num> NUM
@@ -36,7 +36,7 @@
 
 %left OR
 %left AND
-%left EQ NEQ
+%left EQ NEQ '<' '>' LE GE
 %left '+' '-'
 %left '*' '/'
 %right '!'
@@ -111,6 +111,18 @@ E   : E '+' E { $$ = createNode("+",0,$1,$3); }
     | E OR E    { $$ = createNode("OR",0,$1,$3); }
 
     | E AND E   { $$ = createNode("AND",0,$1,$3); }
+
+    | E EQ E   { $$ = createNode("==",0,$1,$3); }
+
+    | E NEQ E   { $$ = createNode("!=",0,$1,$3); }
+
+    | E LE E   { $$ = createNode("<=",0,$1,$3); }
+
+    | E GE E   { $$ = createNode(">=",0,$1,$3); }
+
+    | E '<' E   { $$ = createNode("<",0,$1,$3); }
+    
+    | E '>' E   { $$ = createNode(">",0,$1,$3); }
 
     | '!' E { $$ = createNode("!",0,$2,NULL); }
 
