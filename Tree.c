@@ -24,8 +24,6 @@ void printTree(Tree *n, int level) {
         printf("%s(%d)\n", tipo, n->value);
     else if (n->tipo == NODE_ID)
         printf("%s(%s)\n", tipo, n->name);
-    else if (n->tipo == NODE_MUL)
-        printf("%s(%s)\n", tipo, n->name);
     else if (n->tipo == NODE_PLUS)
         printf("%s(%s)\n", tipo, n->name);
     else
