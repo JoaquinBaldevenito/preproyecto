@@ -62,9 +62,11 @@ NUMERO      0|[1-9][0-9]*
 .                   { printf("Caracter desconocido: %s\n", yytext); }
 %%
 
+int had_error = 0;
 
 void yyerror(){
 	printf("%s%d\n","-> ERROR Sintactico en la linea: ",yylineno);
+    had_error = 1;
 }
 
 int main(int argc,char *argv[]){
@@ -75,5 +77,6 @@ int main(int argc,char *argv[]){
 		yyin = stdin;
 
 	yyparse();
+    return had_error;
 
 }

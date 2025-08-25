@@ -1,3 +1,5 @@
+#ifndef TREE_H
+#define TREE_H
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -14,3 +16,5 @@ typedef struct Tree {
 
 Tree* createNode(char *tipo, int value, Tree *left, Tree *right);
 void printTree(Tree *n, int level);
+
+#endif /* TREE_H */

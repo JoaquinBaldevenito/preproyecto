@@ -1,0 +1,5 @@
+void main() {
+    int contador = 0;
+    contador = contador + 1;
+    return;
+}

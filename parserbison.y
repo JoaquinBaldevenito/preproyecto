@@ -106,6 +106,10 @@ E   : E '+' E { $$ = createNode("+",0,$1,$3); }
 
     | E '*' E   { $$ = createNode("*",0,$1,$3); }
 
+    | E '-' E { $$ = createNode("-",0,$1,$3); }
+
+    | E '/' E { $$ = createNode("/",0,$1,$3); }
+
     | '(' E ')' { $$ = createNode("()",0,$2,NULL); }
 
     | E OR E    { $$ = createNode("OR",0,$1,$3); }

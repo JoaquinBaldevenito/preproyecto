@@ -1,0 +1,5 @@
+int main(int n, bool cond) {
+    int x = n * 10;
+    bool ok = cond && true;
+    return x;
+}
