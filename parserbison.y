@@ -99,7 +99,8 @@ declaracion
         else t = TYPE_VOID;
 
         // Insertar en la tabla
-        Symbol *s = insertSymbol(symtab, $2, t, 0);
+        Valores v; 
+        Symbol *s = insertSymbol(symtab, $2, t, v);
         // Crear nodo AST con símbolo
         $$ = createNode(NODE_DECLARATION, s, $1, NULL);
     }
@@ -110,7 +111,9 @@ declaracion
         else if ($1->tipo == NODE_T_BOOL) t = TYPE_BOOL;
         else t = TYPE_VOID;
 
-        Symbol *s = insertSymbol(symtab, $2, t, 0);
+        Valores v;
+        v.value = $4->sym->valor.value;
+        Symbol *s = insertSymbol(symtab, $2, t, v);
         $$ = createNode(NODE_DECLARATION, s, $1, $4);
     }
 ;
@@ -122,8 +125,8 @@ asignacion
         Symbol *s = lookupSymbol(symtab, $1);
         if (!s) {
             fprintf(stderr, "Error: variable '%s' no declarada\n", $1);
-            s = insertSymbol(symtab, $1, TYPE_INT, 0); // fallback
         }
+        s->valor.value = $3->sym->valor.value;
 
         // Nodo asignación, enlazado al símbolo
         $$ = createNode(NODE_ASSIGN, s, $3, NULL);
@@ -170,21 +173,26 @@ E   : E '+' E { $$ = createNode(NODE_SUM,0,$1,$3); }
         Symbol *s = lookupSymbol(symtab, $1);
         if (!s) {
             fprintf(stderr, "Error: variable '%s' no declarada\n", $1);
-            s = insertSymbol(symtab, $1, TYPE_INT, 0); // fallback
         }
         $$ = createNode(NODE_ID, s, NULL, NULL);
     }
 
     | INT {
-        Symbol *s = insertSymbol(symtab, NULL, TYPE_INT, $1);
+        Symbol *s;
+        s->valor.value = $1;
+        s->type = TYPE_INT;
         $$ = createNode(NODE_T_INT, s, NULL, NULL);
     }
     | TRUE {
-        Symbol *s = insertSymbol(symtab, NULL, TYPE_BOOL, 1);
+        Symbol *s;
+        s->valor.value = 1;
+        s->type = TYPE_BOOL;
         $$ = createNode(NODE_TRUE, s, NULL, NULL);
     }
     | FALSE {
-        Symbol *s = insertSymbol(symtab, NULL, TYPE_BOOL, 0);
+        Symbol *s;
+        s->valor.value = 0;
+        s->type = TYPE_BOOL;
         $$ = createNode(NODE_FALSE, s, NULL, NULL);
     }
     ;

@@ -3,6 +3,13 @@
 
 #include <stdio.h>
 
+typedef union {
+    int value;             /* usado si es número */
+    char *string;           /* usado si es identificador */
+}Valores;
+    
+
+
 typedef enum {
     TYPE_INT,
     TYPE_BOOL,
@@ -11,8 +18,8 @@ typedef enum {
 
 typedef struct Symbol {
     SymbolType type;        /* tipo de dato */
-    int value;             /* usado si es número */
-    char *name;           /* usado si es identificador */
+    char *name;   
+    Valores valor;      /* usado si es identificador */
 } Symbol;
 
 #endif /*SYMBOL_H*/

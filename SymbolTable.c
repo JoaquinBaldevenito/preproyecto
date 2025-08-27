@@ -10,7 +10,7 @@ SymbolTable* createTable() {
     return t;
 }
 
-Symbol* insertSymbol(SymbolTable *table, const char *name, SymbolType type, int value) {
+Symbol* insertSymbol(SymbolTable *table, const char *name, SymbolType type, Valores value ) {
     if (!name) {
     fprintf(stderr, "Error: insertSymbol recibió un nombre NULL\n");
     return NULL;
@@ -32,7 +32,13 @@ Symbol* insertSymbol(SymbolTable *table, const char *name, SymbolType type, int 
     Symbol *s = malloc(sizeof(Symbol));
     s->name = strdup(name);
     s->type = type;
-    s->value = value;
+    if (type == TYPE_INT )
+    {
+        s->valor.value = value.value;    
+    } else if (type == TYPE_BOOL)
+    {
+        s->valor.value = value.value;
+    }
 
     table->symbols[table->size++] = s;
     return s;

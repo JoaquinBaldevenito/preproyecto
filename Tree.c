@@ -27,7 +27,7 @@ void printTree(Tree *n, int level) {
                tipo,
                n->sym->name ? n->sym->name : "anon",
                n->sym->type,
-               n->sym->value);
+               n->sym->valor.value);
     } else {
         printf("%s\n", tipo);
     }
