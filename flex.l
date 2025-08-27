@@ -4,7 +4,7 @@
 #include <stdlib.h>
     /* Definimos tokens para el parser (Bison/Yacc) */
 #include "parserbison.tab.h"
-
+#include "SymbolTable.h"
 %}
 
 %option noyywrap
@@ -63,22 +63,3 @@ NUMERO      0|[1-9][0-9]*
 
 .                   { printf("Caracter desconocido: %s\n", yytext); }
 %%
-
-int had_error = 0;
-
-void yyerror(){
-	printf("%s%d\n","-> ERROR Sintactico en la linea: ",yylineno);
-    had_error = 1;
-}
-
-int main(int argc,char *argv[]){
-	++argv,--argc;
-	if (argc > 0)
-		yyin = fopen(argv[0],"r");
-	else
-		yyin = stdin;
-
-	yyparse();
-    return had_error;
-
-}

@@ -2,13 +2,14 @@
 #include <stdio.h>
 #include <string.h>
 #include "Tree.h"
+#include "Symbol.h"   
+
 struct Tree;  /* forward declaration */
 
-Tree* createNode(typeTree tipo, int value, Tree *left, Tree *right) {
+Tree* createNode(typeTree tipo, Symbol *sym, Tree *left, Tree *right) {
     Tree *n = malloc(sizeof(Tree));
     n->tipo = tipo;
-    n->value = value;
-    n->name = NULL;
+    n->sym = sym;
     n->left = left;
     n->right = right;
     return n;
@@ -16,30 +17,32 @@ Tree* createNode(typeTree tipo, int value, Tree *left, Tree *right) {
 
 void printTree(Tree *n, int level) {
     if (!n) return;
-    
-    for (int i=0; i<level; i++) printf("  ");
-    
-    const char *tipo = tipoToStr(n->tipo); // Convert enum to string    
-    if (n->tipo == NODE_T_INT)
-        printf("%s(%d)\n", tipo, n->value);
-    else if (n->tipo == NODE_ID)
-        printf("%s(%s)\n", tipo, n->name);
-    else if (n->tipo == NODE_PLUS)
-        printf("%s(%s)\n", tipo, n->name);
-    else
-        printf("%s\n", tipo);
 
-    if(n->left) {
-        for(int i=0;i<=level;i++) printf("  "); 
+    for (int i = 0; i < level; i++) printf("  ");
+
+    const char *tipo = tipoToStr(n->tipo);
+
+    if (n->sym) {
+        printf("%s(Symbol: %s, type=%d, value=%d)\n",
+               tipo,
+               n->sym->name ? n->sym->name : "anon",
+               n->sym->type,
+               n->sym->value);
+    } else {
+        printf("%s\n", tipo);
+    }
+
+    if (n->left) {
+        for (int i = 0; i <= level; i++) printf("  ");
         printf("left:\n");
-        printTree(n->left, level+2);
+        printTree(n->left, level + 2);
     }
-    if(n->right) {
-        for(int i=0;i<=level;i++) printf("  ");
+    if (n->right) {
+        for (int i = 0; i <= level; i++) printf("  ");
         printf("right:\n");
-        printTree(n->right, level+2);
+        printTree(n->right, level + 2);
     }
-  }
+}
 
     const char* tipoToStr(typeTree t) {
       switch (t) {

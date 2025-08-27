@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include "Symbol.h"
+
 struct Tree;
 
 typedef enum{
@@ -41,13 +43,12 @@ typedef enum{
 
 typedef struct Tree {
     typeTree tipo;            /* nombre del nodo: "INT", "+", "*" ... */
-    int value;             /* usado si es número */
-    char *name;           /* usado si es identificador */
+    struct Symbol *sym;
     struct Tree *left;
     struct Tree *right;
 }Tree;
 
-Tree* createNode(typeTree tipo, int value, Tree *left, Tree *right);
+Tree* createNode(typeTree tipo, Symbol *sym, Tree *left, Tree *right);
 void printTree(Tree *n, int level);
 const char* tipoToStr(typeTree t);
 
