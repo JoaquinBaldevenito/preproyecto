@@ -103,10 +103,20 @@ declaracion
         // Crear nodo AST con símbolo
         $$ = createNode(NODE_DECLARATION, s, $1, NULL);
     }
-    | T asignacion { $$ = $2; }
+    | T ID '=' E {
+        // Declaración + inicialización
+        SymbolType t;
+        if ($1->tipo == NODE_T_INT) t = TYPE_INT;
+        else if ($1->tipo == NODE_T_BOOL) t = TYPE_BOOL;
+        else t = TYPE_VOID;
+
+        Symbol *s = insertSymbol(symtab, $2, t, 0);
+        $$ = createNode(NODE_DECLARATION, s, $1, $4);
+    }
 ;
 
 asignacion 
+    // solo asignaciones
     : ID '=' E {
         // Buscar símbolo (debe existir previamente en tabla)
         Symbol *s = lookupSymbol(symtab, $1);

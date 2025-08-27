@@ -11,10 +11,16 @@ SymbolTable* createTable() {
 }
 
 Symbol* insertSymbol(SymbolTable *table, const char *name, SymbolType type, int value) {
+    if (!name) {
+    fprintf(stderr, "Error: insertSymbol recibió un nombre NULL\n");
+    return NULL;
+    }
     // Chequear duplicados
     for (int i = 0; i < table->size; i++) {
-        if (strcmp(table->symbols[i]->name, name) == 0) {
-            return table->symbols[i]; // ya existe
+        if (table->symbols[i] && table->symbols[i]->name) {
+            if (strcmp(table->symbols[i]->name, name) == 0) {
+                return table->symbols[i]; // ya existe
+            }
         }
     }
 

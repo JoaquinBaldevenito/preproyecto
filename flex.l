@@ -11,7 +11,6 @@
 %option yylineno
 
     /* ======== EXPRESIONES REGULARES ======== */
-DIGITO      [0-9]
 LETRA       [a-zA-Z]
 ID          [a-z][a-zA-Z0-9]*
 NUMERO      0|[1-9][0-9]*
