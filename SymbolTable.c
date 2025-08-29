@@ -51,3 +51,11 @@ Symbol* lookupSymbol(SymbolTable *table, const char *name) {
     }
     return NULL;
 }
+
+void printSymbolTable(SymbolTable *table) {
+    printf("Tabla de símbolos:\n");
+    for (int i = 0; i < table->size; i++) {
+        Symbol *s = table->symbols[i];
+        printf("  %s = %d (tipo: %d)\n", s->name, s->valor.value, s->type);
+    }
+}
