@@ -233,5 +233,6 @@ int main(int argc,char *argv[]){
     printf("\nÁrbol después de ejecutar asignaciones:\n");
     printTree(ast_root, 0);
 
+    printSymbolTable(symtab);
     return 0;
 }

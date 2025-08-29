@@ -12,5 +12,6 @@ typedef struct SymbolTable {
 SymbolTable* createTable();
 Symbol* insertSymbol(SymbolTable *table, const char *name, SymbolType type, Valores value);
 Symbol* lookupSymbol(SymbolTable *table, const char *name);
+void printSymbolTable(SymbolTable *table);
 
 #endif
