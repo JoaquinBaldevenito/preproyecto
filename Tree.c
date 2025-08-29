@@ -80,44 +80,47 @@ const char* tipoToStr(typeTree t) {
     }
 }
 
-void execute(Tree *n) {
-    if (!n) return;
+void execute(Tree *node) {
+    if (!node) return;
 
-    switch (n->tipo) {
-        case NODE_ASSIGN: {
-            Symbol *s = n->sym;
-            Tree *expr = n->left;
-            execute(expr);         // calcula la expresión antes
-            if (expr->sym) {
-                s->valor.value = expr->sym->valor.value;
+    switch(node->tipo) {
+        case NODE_ASSIGN:
+            node->sym->valor.value = evaluate(node->left);
+            break;
+
+        case NODE_LIST:
+        case NODE_BLOCK:
+        case NODE_PROGRAM:
+        case NODE_RESTO:
+            execute(node->left);
+            execute(node->right);
+            break;
+
+        case NODE_DECLARATION:
+            if (node->right) { // Si tiene inicialización
+                node->sym->valor.value = evaluate(node->right);
             }
             break;
-        }
-        case NODE_DECLARATION:
-            if (n->left) execute(n->left);
-            if (n->right) execute(n->right);
-            break;
-        case NODE_SUM:
-        case NODE_MUL:
-        case NODE_RES:
-        case NODE_DIV: {
-            execute(n->left);
-            execute(n->right);
-            int v1 = n->left->sym->valor.value;
-            int v2 = n->right->sym->valor.value;
-            Symbol *s = malloc(sizeof(Symbol));
-            s->valor.value = 
-                (n->tipo == NODE_SUM) ? v1 + v2 :
-                (n->tipo == NODE_RES) ? v1 - v2 :
-                (n->tipo == NODE_MUL) ? v1 * v2 :
-                (v2 != 0 ? v1 / v2 : 0);
-            s->type = TYPE_INT;
-            n->sym = s;
-            break;
-        }
+
         default:
-            execute(n->left);
-            execute(n->right);
+            // Otros nodos no hacen nada
             break;
     }
 }
+
+int evaluate(Tree *node) {
+    if (!node) return 0;
+    switch(node->tipo) {
+        case NODE_INT: return node->sym->valor.value;
+        case NODE_TRUE: return 1;
+        case NODE_FALSE: return 0;
+        case NODE_ID: return node->sym->valor.value;
+        case NODE_SUM: return evaluate(node->left) + evaluate(node->right);
+        case NODE_RES: return evaluate(node->left) - evaluate(node->right);
+        case NODE_MUL: return evaluate(node->left) * evaluate(node->right);
+        case NODE_DIV: return evaluate(node->left) / evaluate(node->right);
+        // Agregá más operadores según tu gramática
+        default: return 0;
+    }
+}
+

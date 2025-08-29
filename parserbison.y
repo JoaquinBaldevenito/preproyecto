@@ -8,8 +8,16 @@ extern FILE *yyin;
 extern int yylineno;
 
 SymbolTable *symtab;
+Tree *ast_root;
 int yylex(void);
 
+int had_error = 0;
+
+void yyerror(const char *s) {
+    extern int yylineno;   
+    printf("-> ERROR Sintáctico en la línea %d: %s\n", yylineno, s);
+    had_error = 1;
+}
 
 %}
 
@@ -54,8 +62,7 @@ int yylex(void);
 %%
 programa : T MAIN resto{ 
                         printf("No hay errores \n");
-                        {$$ = createNode(NODE_PROGRAM, 0, $1, $3);}
-                        printTree($$, 0);
+                        ast_root = createNode(NODE_PROGRAM, 0, $1, $3);
                         }
         ;
 
@@ -207,38 +214,24 @@ E   : E '+' E { $$ = createNode(NODE_SUM,0,$1,$3); }
 %%
 
 
-int had_error = 0;
-SymbolTable *symtab;
-
-
-void yyerror(const char *s) {
-    extern int yylineno;   
-    printf("-> ERROR Sintáctico en la línea %d: %s\n", yylineno, s);
-    had_error = 1;
-}
-
-
 int main(int argc,char *argv[]){
     symtab = createTable();
-	++argv,--argc;
-	if (argc > 0)
-		yyin = fopen(argv[0],"r");
-	else
-		yyin = stdin;
+    ++argv,--argc;
+    if (argc > 0)
+        yyin = fopen(argv[0],"r");
+    else
+        yyin = stdin;
 
-    Tree *root;
-    yyparse();  // construir AST
+    yyparse();
 
-    // Aquí imprimimos el árbol antes de ejecutar las asignaciones
     printf("Árbol antes de ejecutar asignaciones:\n");
-    printTree(root, 0);
+    printTree(ast_root, 0);
 
-    // Ejecutamos asignaciones y demás
-    execute(root);
+    // Ejecutar asignaciones
+    execute(ast_root);
 
-    // Opcional: imprimir después de ejecutar
-    printf("Árbol después de ejecutar asignaciones:\n");
-    printTree(root, 0);
+    printf("\nÁrbol después de ejecutar asignaciones:\n");
+    printTree(ast_root, 0);
 
     return 0;
 }
