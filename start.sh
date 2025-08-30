@@ -4,7 +4,7 @@
 echo ">> Compilando analizador..."
 bison -d parserbison.y || { echo "Error en Bison"; exit 1; }
 flex flex.l || { echo "Error en Flex"; exit 1; }
-gcc -o act1 parserbison.tab.c lex.yy.c Tree.c -lfl || { echo "Error en compilación"; exit 1; }
+gcc -o act1 parserbison.tab.c lex.yy.c Tree.c SymbolTable.c -lfl || { echo "Error en compilación"; exit 1; }
 echo ">> Compilación exitosa"
 echo
 

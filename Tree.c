@@ -2,13 +2,14 @@
 #include <stdio.h>
 #include <string.h>
 #include "Tree.h"
+#include "Symbol.h"   
+
 struct Tree;  /* forward declaration */
 
-Tree* createNode(typeTree tipo, int value, Tree *left, Tree *right) {
+Tree* createNode(typeTree tipo, Symbol *sym, Tree *left, Tree *right) {
     Tree *n = malloc(sizeof(Tree));
     n->tipo = tipo;
-    n->value = value;
-    n->name = NULL;
+    n->sym = sym;
     n->left = left;
     n->right = right;
     return n;
@@ -16,63 +17,125 @@ Tree* createNode(typeTree tipo, int value, Tree *left, Tree *right) {
 
 void printTree(Tree *n, int level) {
     if (!n) return;
-    
-    for (int i=0; i<level; i++) printf("  ");
-    
-    const char *tipo = tipoToStr(n->tipo); // Convert enum to string    
-    if (n->tipo == NODE_T_INT)
-        printf("%s(%d)\n", tipo, n->value);
-    else if (n->tipo == NODE_ID)
-        printf("%s(%s)\n", tipo, n->name);
-    else if (n->tipo == NODE_PLUS)
-        printf("%s(%s)\n", tipo, n->name);
-    else
+
+    for (int i = 0; i < level; i++) printf("  ");
+
+    const char *tipo = tipoToStr(n->tipo);
+
+    if (n->sym) {
+        printf("%s(Symbol: %s, type=%d, value=%d)\n",
+                tipo,
+                n->sym->name ? n->sym->name : "anon",
+                n->sym->type,
+                n->sym->valor.value);
+    } else {
         printf("%s\n", tipo);
+    }
 
-    if(n->left) {
-        for(int i=0;i<=level;i++) printf("  "); 
+    if (n->left) {
+        for (int i = 0; i <= level; i++) printf("  ");
         printf("left:\n");
-        printTree(n->left, level+2);
+        printTree(n->left, level + 2);
     }
-    if(n->right) {
-        for(int i=0;i<=level;i++) printf("  ");
+    if (n->right) {
+        for (int i = 0; i <= level; i++) printf("  ");
         printf("right:\n");
-        printTree(n->right, level+2);
+        printTree(n->right, level + 2);
     }
-  }
+}
 
-    const char* tipoToStr(typeTree t) {
-      switch (t) {
-          case NODE_ID:    return "ID";
-          case NODE_PLUS:  return "PLUS";
-          case NODE_MUL:   return "*";
-          case NODE_RES:   return "-";
-          case NODE_DIV:   return "/";
-          case NODE_PROGRAM: return "PROGRAM";
-          case NODE_RESTO: return "RESTO";
-          case NODE_ARGS:  return "ARGS";
-          case NODE_LIST:  return "LIST";
-          case NODE_BLOCK: return "BLOCK";
-          case NODE_RETURN: return "RETURN";
-          case NODE_DECLARATION: return "DECLARATION";
-          case NODE_ASSIGN: return "=";
-          case NODE_TRUE:  return "TRUE";
-          case NODE_FALSE: return "FALSE";
-          case NODE_T_INT: return "T_INT";
-          case NODE_T_BOOL: return "T_BOOL";
-          case NODE_T_VOID: return "T_VOID";
-          case NODE_OR:    return "OR";
-          case NODE_AND:   return "AND";
-          case NODE_NOT:   return "¬";
-          case NODE_PARENS: return "()";
-          case NODE_SUM:   return "+";
-          case NODE_EQ:   return "==";
-          case NODE_NEQ:   return "!=";
-          case NODE_LE:   return "<=";
-          case NODE_LT:   return "<";
-          case NODE_GE:   return ">=";
-          case NODE_GT:   return ">";
-          default:         return "STRING";
-      }
+const char* tipoToStr(typeTree t) {
+    switch (t) {
+        case NODE_ID:    return "ID";
+        case NODE_PLUS:  return "PLUS";
+        case NODE_MUL:   return "*";
+        case NODE_RES:   return "-";
+        case NODE_DIV:   return "/";
+        case NODE_PROGRAM: return "PROGRAM";
+        case NODE_RESTO: return "RESTO";
+        case NODE_ARGS:  return "ARGS";
+        case NODE_LIST:  return "LIST";
+        case NODE_BLOCK: return "BLOCK";
+        case NODE_RETURN: return "RETURN";
+        case NODE_DECLARATION: return "DECLARATION";
+        case NODE_ASSIGN: return "=";
+        case NODE_TRUE:  return "TRUE";
+        case NODE_INT: return "INT";
+        case NODE_FALSE: return "FALSE";
+        case NODE_T_INT: return "T_INT";
+        case NODE_T_BOOL: return "T_BOOL";
+        case NODE_T_VOID: return "T_VOID";
+        case NODE_OR:    return "OR";
+        case NODE_AND:   return "AND";
+        case NODE_NOT:   return "¬";
+        case NODE_PARENS: return "()";
+        case NODE_SUM:   return "+";
+        case NODE_EQ:   return "==";
+        case NODE_NEQ:   return "!=";
+        case NODE_LE:   return "<=";
+        case NODE_LT:   return "<";
+        case NODE_GE:   return ">=";
+        case NODE_GT:   return ">";
+        default:         return "STRING";
     }
+}
+
+void execute(Tree *node) {
+    if (!node) return;
+
+    switch(node->tipo) {
+        case NODE_ASSIGN:
+            node->sym->valor.value = evaluate(node->left);
+            break;
+
+        case NODE_LIST:
+        case NODE_BLOCK:
+        case NODE_PROGRAM:
+        case NODE_RESTO:
+            execute(node->left);
+            execute(node->right);
+            break;
+
+        case NODE_DECLARATION:
+            if (node->right) { // Si tiene inicialización
+                node->sym->valor.value = evaluate(node->right);
+            }
+            break;
+
+        default:
+            // Otros nodos no hacen nada
+            break;
+    }
+}
+
+int evaluate(Tree *node) {
+    if (!node) return 0;
+    switch(node->tipo) {
+        case NODE_INT: return node->sym->valor.value;
+        case NODE_TRUE: return 1;
+        case NODE_FALSE: return 0;
+
+        case NODE_ID: return node->sym->valor.value;
+        
+        case NODE_SUM: return evaluate(node->left) + evaluate(node->right);
+        case NODE_RES: return evaluate(node->left) - evaluate(node->right);
+        case NODE_MUL: return evaluate(node->left) * evaluate(node->right);
+        case NODE_DIV: return evaluate(node->left) / evaluate(node->right);
+        
+        case NODE_PARENS: return evaluate(node->left);  
+
+        case NODE_OR:    return evaluate(node->left) || evaluate(node->right);
+        case NODE_AND:   return evaluate(node->left) && evaluate(node->right);
+        case NODE_NOT:   return !evaluate(node->left);
+        case NODE_EQ:    return evaluate(node->left) == evaluate(node->right);
+        case NODE_NEQ:   return evaluate(node->left) != evaluate(node->right);
+        case NODE_LE:    return evaluate(node->left) <= evaluate(node->right);
+        case NODE_LT:    return evaluate(node->left) <  evaluate(node->right);
+        case NODE_GE:    return evaluate(node->left) >= evaluate(node->right);
+        case NODE_GT:    return evaluate(node->left) >  evaluate(node->right);
+
+        // Agregá más operadores según tu gramática
+        default: return 0;
+    }
+}
 

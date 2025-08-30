@@ -1,18 +1,35 @@
 %{
-
+#include <stdio.h>
+#include <stdlib.h>
 #include "Tree.h"
+#include "SymbolTable.h"
 
+extern FILE *yyin;
+extern int yylineno;
+
+SymbolTable *symtab;
+Tree *ast_root;
+int yylex(void);
+
+int had_error = 0;
+
+void yyerror(const char *s) {
+    extern int yylineno;   
+    printf("-> ERROR Sintáctico en la línea %d: %s\n", yylineno, s);
+    had_error = 1;
+}
 
 %}
 
 %union {
-    int num;    /* para INT */
-    char* id;   /* para ID */
-    struct Tree* node;  /* para expresiones */
+    int num;               /* para INT */
+    char* id;             /* para ID */
+    struct Tree* node;   /* para expresiones */
+    struct Symbol* sym; /* para la tabla de simbolos*/
 }
 
 /* Palabras Reservadas*/
-%token MAIN BOOL VOID RETURN IF ELSE WHILE T_INT T_BOOL T_VOID
+%token MAIN RETURN IF ELSE WHILE T_INT T_BOOL T_VOID
 
 %token <num> INT /* Números enteros */
 
@@ -24,13 +41,14 @@
 
 /* Numeros e identificadores */
 %token <num> NUM
-%token <id>ID
+%token <id> ID
 
 /* ==== No terminales con tipo ==== */
 %type <node> E T 
 
 /* ==== Bloques, sentencias y declaraciones ==== */
 %type <node> programa resto args parameters bloque lista_sentencias sentencia declaracion asignacion
+
 
 /* ==== Precedencia y asociatividad ==== */
 
@@ -44,8 +62,7 @@
 %%
 programa : T MAIN resto{ 
                         printf("No hay errores \n");
-                        {$$ = createNode(NODE_PROGRAM, 0, $1, $3);}
-                        printTree($$, 0);
+                        ast_root = createNode(NODE_PROGRAM, 0, $1, $3);
                         }
         ;
 
@@ -79,21 +96,56 @@ sentencia : declaracion ';'
           | RETURN ';' {$$ = createNode(NODE_RETURN, 0, NULL, NULL);}
           ;
 
-declaracion : T ID {Tree* aux = createNode(NODE_ID, 0, NULL, NULL);
-                    aux->name = $2;
-                    $$ = createNode(NODE_DECLARATION, 0, $1, aux);
-                    $$->left->name = $2; 
-                  }
-            | T asignacion
-            ;
+declaracion 
+    : T ID {
+        Symbol *s = lookupSymbol(symtab, $2);
+        if (s) {
+            fprintf(stderr, "Error: variable '%s' ya declarada\n", $2);
+        }
+        // Mapear el nodo de tipo T a SymbolType
+        SymbolType t;
+        if ($1->tipo == NODE_T_INT) t = TYPE_INT;
+        else if ($1->tipo == NODE_T_BOOL) t = TYPE_BOOL;
+        else t = TYPE_VOID;
 
-asignacion : ID '=' E { 
-                $$ = createNode(NODE_ASSIGN,0,NULL,NULL);
-                $$->left = createNode(NODE_ID,0,NULL,NULL);
-                $$->left->name = $1; 
-                $$->right = $3; 
-            }
-           ;
+        // Insertar en la tabla
+        Valores v = {0}; 
+        Symbol *aux = insertSymbol(symtab, $2, t, v);
+        // Crear nodo AST con símbolo
+        $$ = createNode(NODE_DECLARATION, aux, $1, NULL);
+    }
+    | T ID '=' E {
+        //Chequeo de inicialización
+        Symbol *s = lookupSymbol(symtab, $2);
+        if (s) {
+            fprintf(stderr, "Error: variable '%s' ya declarada\n", $2);
+        }
+        // Declaración + inicialización
+        SymbolType t;
+        if ($1->tipo == NODE_T_INT) t = TYPE_INT;
+        else if ($1->tipo == NODE_T_BOOL) t = TYPE_BOOL;
+        else t = TYPE_VOID;
+
+        Valores v = {0};
+        Symbol *aux = insertSymbol(symtab, $2, t, v);
+        $$ = createNode(NODE_DECLARATION, aux, $1, $4);
+    }
+;
+
+asignacion 
+    // solo asignaciones
+    : ID '=' E {
+        // Buscar símbolo (debe existir previamente en tabla)
+        Symbol *s = lookupSymbol(symtab, $1);
+        if (!s) {
+            fprintf(stderr, "Error: variable '%s' no declarada\n", $1);
+        }
+
+        // Nodo asignación, enlazado al símbolo
+        $$ = createNode(NODE_ASSIGN, s, $3, NULL);
+    }
+    ;
+
 
 T : T_INT { $$ = createNode(NODE_T_INT, 0, NULL, NULL); }
     | T_BOOL { $$ = createNode(NODE_T_BOOL, 0, NULL, NULL); }
@@ -130,13 +182,60 @@ E   : E '+' E { $$ = createNode(NODE_SUM,0,$1,$3); }
     
     | E '>' E   { $$ = createNode(NODE_GT,0,$1,$3); }
 
-    | ID { $$ = createNode(NODE_ID,0,NULL,NULL);
-            $$->name = $1; }
+    | ID {
+        Symbol *s = lookupSymbol(symtab, $1);
+        if (!s) {
+            fprintf(stderr, "Error: variable '%s' no declarada\n", $1);
+        }
+        $$ = createNode(NODE_ID, s, NULL, NULL);
+    }
 
-    | INT { $$ = createNode(NODE_T_INT,$1,NULL,NULL); }
-
-    | TRUE { $$ = createNode(NODE_TRUE,1,NULL,NULL); }
-
-    | FALSE { $$ = createNode(NODE_FALSE,0,NULL,NULL); }
+    | INT {
+        Symbol *s = malloc(sizeof(Symbol));
+        if (!s) { fprintf(stderr, "Error: sin memoria\n"); exit(1); }
+        s->valor.value = $1;
+        s->type = TYPE_INT;
+        $$ = createNode(NODE_INT, s, NULL, NULL);
+    }
+    | TRUE {
+        Symbol *s = malloc(sizeof(Symbol));
+        s->valor.value = 1;
+        s->type = TYPE_BOOL;
+        $$ = createNode(NODE_TRUE, s, NULL, NULL);
+    }
+    | FALSE {
+        Symbol *s = malloc(sizeof(Symbol));
+        s->valor.value = 0;
+        s->type = TYPE_BOOL;
+        $$ = createNode(NODE_FALSE, s, NULL, NULL);
+    }
     ;
 %%
+
+
+int main(int argc,char *argv[]){
+    symtab = createTable();
+    ++argv,--argc;
+    if (argc > 0)
+        yyin = fopen(argv[0],"r");
+    else
+        yyin = stdin;
+
+    yyparse();
+
+    if (had_error || !ast_root) {
+        fprintf(stderr, "Se detectaron errores. No se ejecutará el AST.\n");
+        return 1;
+    }
+    printf("Árbol antes de ejecutar asignaciones:\n");
+    printTree(ast_root, 0);
+
+    // Ejecutar asignaciones
+    execute(ast_root);
+
+    printf("\nÁrbol después de ejecutar asignaciones:\n");
+    printTree(ast_root, 0);
+
+    printSymbolTable(symtab);
+    return 0;
+}
