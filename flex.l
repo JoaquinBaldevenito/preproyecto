@@ -39,7 +39,7 @@ NUMERO      0|[1-9][0-9]*
                     return ID; }
 
     /* Operadores de un solo carácter y delimitadores */
-[+*;(){}=!,-/<>]         {   return *yytext;    }
+[-+*;(){}=!,/<>]         {   return *yytext;    }
 
     /* Operadores de dos caracteres */
 "||"          {   return OR;    }

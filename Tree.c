@@ -114,11 +114,26 @@ int evaluate(Tree *node) {
         case NODE_INT: return node->sym->valor.value;
         case NODE_TRUE: return 1;
         case NODE_FALSE: return 0;
+
         case NODE_ID: return node->sym->valor.value;
+        
         case NODE_SUM: return evaluate(node->left) + evaluate(node->right);
         case NODE_RES: return evaluate(node->left) - evaluate(node->right);
         case NODE_MUL: return evaluate(node->left) * evaluate(node->right);
         case NODE_DIV: return evaluate(node->left) / evaluate(node->right);
+        
+        case NODE_PARENS: return evaluate(node->left);  
+
+        case NODE_OR:    return evaluate(node->left) || evaluate(node->right);
+        case NODE_AND:   return evaluate(node->left) && evaluate(node->right);
+        case NODE_NOT:   return !evaluate(node->left);
+        case NODE_EQ:    return evaluate(node->left) == evaluate(node->right);
+        case NODE_NEQ:   return evaluate(node->left) != evaluate(node->right);
+        case NODE_LE:    return evaluate(node->left) <= evaluate(node->right);
+        case NODE_LT:    return evaluate(node->left) <  evaluate(node->right);
+        case NODE_GE:    return evaluate(node->left) >= evaluate(node->right);
+        case NODE_GT:    return evaluate(node->left) >  evaluate(node->right);
+
         // Agregá más operadores según tu gramática
         default: return 0;
     }

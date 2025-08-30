@@ -29,7 +29,7 @@ void yyerror(const char *s) {
 }
 
 /* Palabras Reservadas*/
-%token MAIN BOOL VOID RETURN IF ELSE WHILE T_INT T_BOOL T_VOID
+%token MAIN RETURN IF ELSE WHILE T_INT T_BOOL T_VOID
 
 %token <num> INT /* Números enteros */
 
@@ -109,7 +109,7 @@ declaracion
         else t = TYPE_VOID;
 
         // Insertar en la tabla
-        Valores v; 
+        Valores v = {0}; 
         Symbol *aux = insertSymbol(symtab, $2, t, v);
         // Crear nodo AST con símbolo
         $$ = createNode(NODE_DECLARATION, aux, $1, NULL);
@@ -126,8 +126,7 @@ declaracion
         else if ($1->tipo == NODE_T_BOOL) t = TYPE_BOOL;
         else t = TYPE_VOID;
 
-        Valores v;
-        v.value = $4->sym->valor.value;
+        Valores v = {0};
         Symbol *aux = insertSymbol(symtab, $2, t, v);
         $$ = createNode(NODE_DECLARATION, aux, $1, $4);
     }
@@ -224,6 +223,10 @@ int main(int argc,char *argv[]){
 
     yyparse();
 
+    if (had_error || !ast_root) {
+        fprintf(stderr, "Se detectaron errores. No se ejecutará el AST.\n");
+        return 1;
+    }
     printf("Árbol antes de ejecutar asignaciones:\n");
     printTree(ast_root, 0);
 
