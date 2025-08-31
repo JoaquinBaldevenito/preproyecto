@@ -233,6 +233,14 @@ int main(int argc,char *argv[]){
     // Ejecutar asignaciones
     execute(ast_root);
 
+    // Chequeo semantico
+    if (check_types(ast_root) == TYPE_ERROR) {
+        fprintf(stderr, "Error semántico\n");
+        return 2;
+    } else {
+        printf("\nSIN ERRORES SEMANTICOS\n");
+    }
+
     printf("\nÁrbol después de ejecutar asignaciones:\n");
     printTree(ast_root, 0);
 

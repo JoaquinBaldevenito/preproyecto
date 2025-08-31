@@ -139,3 +139,82 @@ int evaluate(Tree *node) {
     }
 }
 
+SymbolType check_types(Tree *node){
+    if (!node) return 0;
+    switch(node->tipo) {
+        case NODE_INT: return TYPE_INT;
+        case NODE_TRUE: return TYPE_BOOL;
+        case NODE_FALSE: return TYPE_BOOL;
+
+        case NODE_ID:{
+            Symbol* s = lookupSymbol(node->sym->name);
+            if (!s) {
+                printf("Error: variable %s no declarada\n", node->sym->name);
+                return TYPE_ERROR;
+            }
+            return s->type; 
+        }
+        
+        case NODE_SUM:
+        case NODE_RES:
+        case NODE_MUL: 
+        case NODE_DIV: {
+            SymbolType left = check_types(node->left);
+            SymbolType right = check_types(node->right);
+            if (left != TYPE_INT || right != TYPE_INT){
+                printf("El operador espera enteros");
+                return TYPE_ERROR;
+            }
+            return TYPE_INT;
+        }
+
+        case NODE_LE:   
+        case NODE_LT:    
+        case NODE_GE:    
+        case NODE_GT:{
+            SymbolType left = check_types(node->left);
+            SymbolType right = check_types(node->right);
+            if (left != TYPE_INT || right != TYPE_INT){
+                printf("El operador espera enteros");
+                return TYPE_ERROR;
+            }
+            return TYPE_BOOL; //devuelve un bool
+        }
+
+        case NODE_OR:
+        case NODE_AND: {
+            SymbolType left = check_types(node->left);
+            SymbolType right = check_types(node->right);
+            if (left != TYPE_BOOL || right != TYPE_BOOL){
+                printf("El operador espera valores booleanos");
+                return TYPE_ERROR;
+            }
+            return TYPE_BOOL;
+        }
+        
+        case NODE_NOT: {
+            SymbolType left = check_types(node->left);
+            if (left != TYPE_BOOL){
+                printf("El operador espera valores booleanos");
+                return TYPE_ERROR;
+            }
+            return TYPE_BOOL;
+        }
+        case NODE_EQ:   
+        case NODE_NEQ: {
+            SymbolType left = check_types(node->left);
+            SymbolType right = check_types(node->right);
+            if (left == TYPE_BOOL && right == TYPE_BOOL){
+                return TYPE_BOOL;
+            } else if (left == TYPE_INT && right == TYPE_INT) {
+                return TYPE_BOOL;
+            }
+            return TYPE_ERROR;
+        }
+
+        case NODE_PARENS: return check_types(node->left);  
+
+        default: return TYPE_ERROR;
+
+    }
+}
