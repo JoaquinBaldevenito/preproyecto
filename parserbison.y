@@ -6,6 +6,7 @@
 
 extern FILE *yyin;
 extern int yylineno;
+extern int semantic_error;
 
 SymbolTable *symtab;
 Tree *ast_root;
@@ -234,7 +235,8 @@ int main(int argc,char *argv[]){
     execute(ast_root);
 
     // Chequeo semantico
-    if (check_types(ast_root) == TYPE_ERROR) {
+    check_types(ast_root);
+    if (semantic_error) {
         fprintf(stderr, "Error semántico\n");
         return 2;
     } else {
