@@ -13,7 +13,8 @@ typedef union {
 typedef enum {
     TYPE_INT,
     TYPE_BOOL,
-    TYPE_VOID
+    TYPE_VOID,
+    TYPE_ERROR
 } SymbolType;
 
 typedef struct Symbol {
