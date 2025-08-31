@@ -9,19 +9,30 @@ Este proyecto implementa un compilador para un mini-lenguaje similar a C, con so
 - [`Tree.c`](Tree.c), [`Tree.h`](Tree.h): Definición y manejo del AST
 - [`SymbolTable.c`](SymbolTable.c), [`SymbolTable.h`](SymbolTable.h): Tabla de símbolos
 - [`Symbol.h`](Symbol.h): Definición de símbolos y tipos
-- [`start.sh`](start.sh): Script para compilar y correr tests
+- [`Gramaticas.hs`](Gramaticas.hs): Gramática formal en notación BNF
+- [`Makefile`](Makefile): Automatización de compilación y tests
 - [`test/`](test/): Casos de prueba divididos en `valid`, `syntax` y `semantics`
 - [`resultados/`](resultados/): Salidas de los tests
 
-## Compilación
+## Compilación y Ejecución de Tests
 
-Ejecuta el script de compilación:
+Para compilar y ejecutar todos los tests automáticamente:
 
 ```sh
-./start.sh
+make
 ```
 
-Esto compila el proyecto y ejecuta todos los tests, mostrando los resultados en la carpeta [`resultados/`](resultados/).
+Esto compilará el proyecto y ejecutará los tests, mostrando los resultados en la carpeta [`resultados/`](resultados/).
+
+- Los tests válidos están en [`test/valid/`](test/valid/)
+- Los tests con errores sintácticos están en [`test/syntax/`](test/syntax/)
+- Los tests con errores semánticos están en [`test/semantics/`](test/semantics/)
+
+Para limpiar los archivos generados y los resultados:
+
+```sh
+make clean
+```
 
 ## Ejecución Manual
 
@@ -35,18 +46,9 @@ Puedes ejecutar el compilador manualmente con:
 
 La gramática soportada está documentada en [`Gramaticas.hs`](Gramaticas.hs).
 
-## Tests
-
-- Los tests válidos están en [`test/valid/`](test/valid/)
-- Los tests con errores sintácticos están en [`test/syntax/`](test/syntax/)
-- Los tests con errores semánticos están en [`test/semantics/`](test/semantics/)
-
 ## Dependencias
 
 - Flex
 - Bison
 - GCC
-
-## Créditos
-
-Desarrollado por [Tu
+- Make
