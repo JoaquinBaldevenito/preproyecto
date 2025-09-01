@@ -48,8 +48,18 @@ typedef struct Tree {
     struct Tree *right;
 }Tree;
 
+typedef struct Queue {
+    int cola[100]; // no "int[100] cola"
+    int head;      // índice del frente de la cola
+    int tail;      // índice del final de la cola
+    int size;      // cantidad de elementos
+} Queue;
+
+
 Tree* createNode(typeTree tipo, Symbol *sym, Tree *left, Tree *right);
 void printTree(Tree *n, int level);
 const char* tipoToStr(typeTree t);
+
+
 
 #endif /* TREE_H */

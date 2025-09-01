@@ -5,7 +5,7 @@ BISON=parserbison.y
 FLEX=flex.l
 CC=gcc
 TARGET=act1
-OBJS=parserbison.tab.c lex.yy.c Tree.c SymbolTable.c
+OBJS=parserbison.tab.c lex.yy.c Tree.c SymbolTable.c Stack.c
 FLFLAGS=-lfl
 
 # Carpetas de resultados

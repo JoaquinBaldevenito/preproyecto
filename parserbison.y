@@ -13,6 +13,7 @@ Tree *ast_root;
 int yylex(void);
 
 int had_error = 0;
+int modo_interprete=0;
 
 void yyerror(const char *s) {
     extern int yylineno;   
@@ -230,9 +231,6 @@ int main(int argc,char *argv[]){
     printf("Árbol antes de ejecutar asignaciones:\n");
     printTree(ast_root, 0);
 
-    // Ejecutar asignaciones
-    execute(ast_root);
-
     // Chequeo semantico
     check_types(ast_root);
     if (semantic_error) {
@@ -241,6 +239,11 @@ int main(int argc,char *argv[]){
     } else {
         printf("\nSIN ERRORES SEMANTICOS\n");
     }
+
+    // Ejecutar asignaciones
+    execute(ast_root);
+
+
 
     printf("\nÁrbol después de ejecutar asignaciones:\n");
     printTree(ast_root, 0);
