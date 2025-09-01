@@ -49,7 +49,7 @@ void yyerror(const char *s) {
 %type <node> E T 
 
 /* ==== Bloques, sentencias y declaraciones ==== */
-%type <node> programa resto args parameters bloque lista_sentencias sentencia declaracion asignacion
+%type <node> programa resto args parameters bloque lista_sentencias sentencia declaracion asignacion send_return
 
 
 /* ==== Precedencia y asociatividad ==== */
@@ -79,22 +79,25 @@ parameters : declaracion
             | {$$ = NULL;} /* epsilon */
             ;
 
-bloque : '{' lista_sentencias '}' {$$ = createNode(NODE_BLOCK, 0, $2, NULL);}
+bloque : '{' lista_sentencias send_return '}' {$$ = createNode(NODE_BLOCK, 0, $2, $3);}
         ;
-lista_sentencias : sentencia  lista_sentencias { 
+lista_sentencias : sentencia lista_sentencias { 
                                                     if ($2 == NULL) $$ = $1; 
                                                     else {
                                                         Tree *n = createNode(NODE_LIST, 0, $1, $2);
                                                         $$ = n;
                                                     }
                                                 }
-                | {$$ = NULL;}  /* epsilon */
+                | sentencia
                 ;
 
 sentencia : declaracion ';'
           | asignacion ';'
-          | RETURN E ';' {$$ = createNode(NODE_RETURN, 0, $2, NULL);}
-          | RETURN ';' {$$ = createNode(NODE_RETURN, 0, NULL, NULL);}
+          | {$$ = NULL;} /* epsilon */
+          ;
+
+send_return:  RETURN E ';' {$$ = createNode(NODE_RETURN, 0, $2, NULL);}
+            | RETURN ';' {$$ = createNode(NODE_RETURN, 0, NULL, NULL);}
           ;
 
 declaracion 
