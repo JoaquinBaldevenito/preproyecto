@@ -121,8 +121,14 @@ int evaluate(Tree *node) {
         case NODE_SUM: return evaluate(node->left) + evaluate(node->right);
         case NODE_RES: return evaluate(node->left) - evaluate(node->right);
         case NODE_MUL: return evaluate(node->left) * evaluate(node->right);
-        case NODE_DIV: return evaluate(node->left) / evaluate(node->right);
-        
+        case NODE_DIV: 
+            if (evaluate(node->right) == 0) {
+                printf("Error: División por cero\n");
+                semantic_error = 1;
+                return 0;
+            } else {
+                return evaluate(node->left) / evaluate(node->right);
+            }
         case NODE_PARENS: return evaluate(node->left);  
 
         case NODE_OR:    return evaluate(node->left) || evaluate(node->right);

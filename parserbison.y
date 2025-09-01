@@ -62,7 +62,6 @@ void yyerror(const char *s) {
 
 %%
 programa : T MAIN resto{ 
-                        printf("No hay errores \n");
                         ast_root = createNode(NODE_PROGRAM, 0, $1, $3);
                         }
         ;
