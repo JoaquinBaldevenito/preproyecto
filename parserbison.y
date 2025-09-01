@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include "Tree.h"
 #include "SymbolTable.h"
+#include "CodeGen.h"
 
 extern FILE *yyin;
 extern int yylineno;
@@ -13,6 +14,7 @@ Tree *ast_root;
 int yylex(void);
 
 int had_error = 0;
+int modo_interprete=0;
 
 void yyerror(const char *s) {
     extern int yylineno;   
@@ -230,9 +232,6 @@ int main(int argc,char *argv[]){
     printf("Árbol antes de ejecutar asignaciones:\n");
     printTree(ast_root, 0);
 
-    // Ejecutar asignaciones
-    execute(ast_root);
-
     // Chequeo semantico
     check_types(ast_root);
     if (semantic_error) {
@@ -241,6 +240,16 @@ int main(int argc,char *argv[]){
     } else {
         printf("\nSIN ERRORES SEMANTICOS\n");
     }
+
+    if (modo_interprete==1) {
+        printf("\n=== EJECUCIÓN COMO INTÉRPRETE ===\n");
+        execute(ast_root);
+    } else {
+        printf("\n=== GENERACIÓN DE PSEUDO-ASSEMBLY ===\n");
+        genCode(ast_root);
+    }
+    // Ejecutar asignaciones
+    execute(ast_root);
 
     printf("\nÁrbol después de ejecutar asignaciones:\n");
     printTree(ast_root, 0);
