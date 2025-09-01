@@ -2,10 +2,12 @@
 #include <stdio.h>
 #include <string.h>
 #include "Tree.h"
-#include "Symbol.h"   
+#include "Symbol.h" 
+#include "Stack.h"  
 
 struct Tree;  /* forward declaration */
 int semantic_error = 0;
+extern TypeStack typeStack;
 
 Tree* createNode(typeTree tipo, Symbol *sym, Tree *left, Tree *right) {
     Tree *n = malloc(sizeof(Tree));
@@ -124,7 +126,6 @@ int evaluate(Tree *node) {
         case NODE_DIV: 
             if (evaluate(node->right) == 0) {
                 printf("Error: División por cero\n");
-                semantic_error = 1;
                 return 0;
             } else {
                 return evaluate(node->left) / evaluate(node->right);
@@ -188,12 +189,24 @@ SymbolType check_types(Tree *node){
 
         case NODE_SUM:
         case NODE_RES:
-        case NODE_MUL:
+        case NODE_MUL: {
+            SymbolType left = check_types(node->left);
+            SymbolType right = check_types(node->right);
+            if (left != TYPE_INT || right != TYPE_INT) {
+                printf("Error: operador aritmético espera enteros\n");
+                semantic_error = 1;
+                return TYPE_ERROR;
+            }
+            return TYPE_INT;
+        }
         case NODE_DIV: {
             SymbolType left = check_types(node->left);
             SymbolType right = check_types(node->right);
             if (left != TYPE_INT || right != TYPE_INT) {
                 printf("Error: operador aritmético espera enteros\n");
+                semantic_error = 1;
+                return TYPE_ERROR;
+            } else if(evaluate(node) == 0) {
                 semantic_error = 1;
                 return TYPE_ERROR;
             }
@@ -254,18 +267,33 @@ SymbolType check_types(Tree *node){
          case NODE_LIST:
         case NODE_BLOCK:
         case NODE_RESTO:
-        case NODE_PROGRAM:
             // chequeo recursivo pero tipo void
-            SymbolType left = check_types(node->left);
-            SymbolType right = check_types(node->right);
-            if (left == TYPE_ERROR || right == TYPE_ERROR){
+            check_types(node->left);
+            check_types(node->right);
+            return TYPE_VOID;
+
+        case NODE_PROGRAM: {
+            // push tipo del programa en la pila
+            SymbolType t;
+            if (node->left->tipo == NODE_T_INT) t = TYPE_INT;
+            else if (node->left->tipo == NODE_T_BOOL) t = TYPE_BOOL;
+            else t = TYPE_VOID;
+
+            pushType(&typeStack, t);
+            check_types(node->right);
+            popType(&typeStack);
+            return TYPE_VOID;
+        }
+
+        case NODE_RETURN: {
+            SymbolType expected = peekType(&typeStack);
+            SymbolType got = node->left ? check_types(node->left) : TYPE_VOID;
+            if (expected != got) {
+                printf("Error semántico: return de tipo %d, esperado %d\n", got, expected);
                 semantic_error = 1;
                 return TYPE_ERROR;
             }
-            return TYPE_VOID;
-
-
-        case NODE_RETURN:
-            return node->left ? check_types(node->left) : TYPE_VOID;
+            return got;
+        }
     }
 }
