@@ -33,7 +33,7 @@ compile:
 	@echo "${YELLOW}>> Compilando analizador...${NC}"
 	bison -d $(BISON) || { echo "${RED}Error en Bison${NC}"; exit 1; }
 	flex $(FLEX) || { echo "${RED}Error en Flex${NC}"; exit 1; }
-	$(CC) -o $(TARGET) $(OBJS) $(FLFLAGS) $(CFLAGS) || { echo "${RED}Error en compilación${NC}"; exit 1; }
+	$(CC) -o $(TARGET) $(OBJS) $(FLFLAGS) $(CFLAGS) || $(CC) -o $(TARGET) $(OBJS) $(FLFLAGS) || { echo "${RED}Error en compilación${NC}"; exit 1; }
 	@echo "${GREEN}>> Compilación exitosa${NC}"
 	@mkdir -p $(RESULT_DIRS)
 

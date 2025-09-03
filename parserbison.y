@@ -250,13 +250,13 @@ int main(int argc,char *argv[]){
     if (modo_interprete==1) {
         printf("\n=== EJECUCIÓN COMO INTÉRPRETE ===\n");
         execute(ast_root);
+        printf("\nÁrbol después de ejecutar el INTERPRETE:\n");
+        printTree(ast_root, 0);
     } else {
         printf("\n=== GENERACIÓN DE PSEUDO-ASSEMBLY ===\n");
         genCode(ast_root);
     }
 
-    printf("\nÁrbol después de ejecutar asignaciones:\n");
-    printTree(ast_root, 0);
 
     printSymbolTable(symtab);
     return 0;
