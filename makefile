@@ -7,6 +7,7 @@ CC=gcc
 TARGET=act1
 OBJS=parserbison.tab.c lex.yy.c Tree.c SymbolTable.c Stack.c CodeGen.c
 FLFLAGS=-lfl
+CFLAGS=-Wall -DMODO=$(MODO)
 
 # Carpetas de resultados
 RESULT_DIRS=resultados/valid resultados/syntax resultados/semantics
@@ -32,7 +33,7 @@ compile:
 	@echo "${YELLOW}>> Compilando analizador...${NC}"
 	bison -d $(BISON) || { echo "${RED}Error en Bison${NC}"; exit 1; }
 	flex $(FLEX) || { echo "${RED}Error en Flex${NC}"; exit 1; }
-	$(CC) -o $(TARGET) $(OBJS) $(FLFLAGS) || { echo "${RED}Error en compilación${NC}"; exit 1; }
+	$(CC) -o $(TARGET) $(OBJS) $(FLFLAGS) $(CFLAGS) || $(CC) -o $(TARGET) $(OBJS) $(FLFLAGS) || { echo "${RED}Error en compilación${NC}"; exit 1; }
 	@echo "${GREEN}>> Compilación exitosa${NC}"
 	@mkdir -p $(RESULT_DIRS)
 
