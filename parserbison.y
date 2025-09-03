@@ -14,7 +14,10 @@ Tree *ast_root;
 int yylex(void);
 
 int had_error = 0;
-int modo_interprete=0;
+#ifndef MODO
+#define MODO 1
+#endif
+int modo_interprete=MODO;
 
 void yyerror(const char *s) {
     extern int yylineno;   
@@ -251,8 +254,6 @@ int main(int argc,char *argv[]){
         printf("\n=== GENERACIÓN DE PSEUDO-ASSEMBLY ===\n");
         genCode(ast_root);
     }
-    // Ejecutar asignaciones
-    execute(ast_root);
 
     printf("\nÁrbol después de ejecutar asignaciones:\n");
     printTree(ast_root, 0);
