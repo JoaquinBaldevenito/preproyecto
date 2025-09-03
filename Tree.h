@@ -55,11 +55,14 @@ typedef struct Queue {
     int size;      // cantidad de elementos
 } Queue;
 
-
+/* Funciones principales de manejo de árbol */
 Tree* createNode(typeTree tipo, Symbol *sym, Tree *left, Tree *right);
 void printTree(Tree *n, int level);
 const char* tipoToStr(typeTree t);
+void execute(Tree *node);
 
+/*Chequeo semantico */
+SymbolType check_types(Tree *node);
 
 
 #endif /* TREE_H */

@@ -83,34 +83,6 @@ const char* tipoToStr(typeTree t) {
     }
 }
 
-void execute(Tree *node) {
-    if (!node) return;
-
-    switch(node->tipo) {
-        case NODE_ASSIGN:
-            node->sym->valor.value = evaluate(node->left);
-            break;
-
-        case NODE_LIST:
-        case NODE_BLOCK:
-        case NODE_PROGRAM:
-        case NODE_RESTO:
-            execute(node->left);
-            execute(node->right);
-            break;
-
-        case NODE_DECLARATION:
-            if (node->right) { // Si tiene inicialización
-                node->sym->valor.value = evaluate(node->right);
-            }
-            break;
-
-        default:
-            // Otros nodos no hacen nada
-            break;
-    }
-}
-
 int evaluate(Tree *node) {
     if (!node) return 0;
     switch(node->tipo) {
@@ -144,6 +116,34 @@ int evaluate(Tree *node) {
 
         // Agregá más operadores según tu gramática
         default: return 0;
+    }
+}
+
+void execute(Tree *node) {
+    if (!node) return;
+
+    switch(node->tipo) {
+        case NODE_ASSIGN:
+            node->sym->valor.value = evaluate(node->left);
+            break;
+
+        case NODE_LIST:
+        case NODE_BLOCK:
+        case NODE_PROGRAM:
+        case NODE_RESTO:
+            execute(node->left);
+            execute(node->right);
+            break;
+
+        case NODE_DECLARATION:
+            if (node->right) { // Si tiene inicialización
+                node->sym->valor.value = evaluate(node->right);
+            }
+            break;
+
+        default:
+            // Otros nodos no hacen nada
+            break;
     }
 }
 
@@ -294,6 +294,12 @@ SymbolType check_types(Tree *node){
                 return TYPE_ERROR;
             }
             return got;
+        }
+
+        default: {
+            printf("Error: nodo de tipo desconocido en check_types\n");
+            semantic_error = 1;
+            return TYPE_ERROR;
         }
     }
 }

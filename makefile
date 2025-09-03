@@ -8,6 +8,7 @@ TARGET=act1
 OBJS=parserbison.tab.c lex.yy.c Tree.c SymbolTable.c Stack.c CodeGen.c
 FLFLAGS=-lfl
 CFLAGS=-Wall -DMODO=$(MODO)
+CFLAGS=-Wall -Wno-switch
 
 # Carpetas de resultados
 RESULT_DIRS=resultados/valid resultados/syntax resultados/semantics
