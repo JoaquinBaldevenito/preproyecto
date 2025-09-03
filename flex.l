@@ -7,7 +7,7 @@
 #include "SymbolTable.h"
 %}
 
-%option noyywrap
+%option noyywrap noinput nounput
 %option yylineno
 
     /* ======== EXPRESIONES REGULARES ======== */
