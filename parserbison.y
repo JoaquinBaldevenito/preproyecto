@@ -14,8 +14,9 @@ Tree *ast_root;
 int yylex(void);
 
 int had_error = 0;
+/* Valor: 1 = intérprete, 0 = pseudo-assembler*/
 #ifndef MODO
-#define MODO 1
+#define MODO 1  /*Valor por defecto: 1*/
 #endif
 int modo_interprete=MODO;
 

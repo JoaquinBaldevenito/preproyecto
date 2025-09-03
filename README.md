@@ -16,10 +16,20 @@ Este proyecto implementa un compilador para un mini-lenguaje similar a C, con so
 
 ## Compilación y Ejecución de Tests
 
-Para compilar y ejecutar todos los tests automáticamente:
+Para compilar y ejecutar todos los tests automáticamente(con config por defecto):
 
 ```sh
 make
+```
+
+Sino para correr con interprete:
+```sh
+make MODO=1
+```
+
+con Assembly:
+```sh
+make MODO=0
 ```
 
 Esto compilará el proyecto y ejecutará los tests, mostrando los resultados en la carpeta [`resultados/`](resultados/).(Crear la carpeta). Para cambiar entre el intérprete y el assembler cambiar el valor de modo_intérprete en el archivo parserbison.y
