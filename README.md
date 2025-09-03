@@ -22,7 +22,7 @@ Para compilar y ejecutar todos los tests automáticamente:
 make
 ```
 
-Esto compilará el proyecto y ejecutará los tests, mostrando los resultados en la carpeta [`resultados/`](resultados/).
+Esto compilará el proyecto y ejecutará los tests, mostrando los resultados en la carpeta [`resultados/`](resultados/).(Crear la carpeta). Para cambiar entre el intérprete y el assembler cambiar el valor de modo_intérprete en el archivo parserbison.y
 
 - Los tests válidos están en [`test/valid/`](test/valid/)
 - Los tests con errores sintácticos están en [`test/syntax/`](test/syntax/)
